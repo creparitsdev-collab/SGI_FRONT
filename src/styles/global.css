@@ -1,0 +1,98 @@
+/* src/styles/global.css */
+
+/* Estilos base para el navbar */
+.navbar {
+    transition: all 0.3s ease-in-out;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+  
+  .navbar-scrolled {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Efecto de ruido para el hero */
+  .hero-noise {
+    position: relative;
+  }
+  
+  .hero-noise::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    z-index: 1;
+  }
+  
+  /* Animaciones */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+  
+  /* Gradiente para el borde inferior del hero */
+  .hero-gradient-bottom {
+    mask-image: linear-gradient(to bottom, transparent, black 30%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 30%);
+  }
+  
+  /* Efectos hover para tarjetas */
+  .feature-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Estilos para mobile navigation */
+  @media (max-width: 768px) {
+    .mobile-menu {
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background-color: rgba(255, 255, 255, 0.95);
+    }
+  }
+  
+  /* Ajustes específicos para el logo */
+  .navbar-logo {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: transform 0.3s ease;
+  }
+  
+  .navbar-logo:hover {
+    transform: scale(1.05);
+  }
+
+  :root {
+    --primary: #00566a;
+    --secondary: #2a9d8f;
+    --accent: #ffbe0b;
+    --dark: #1a202c;
+  }
+  
+  [data-theme='dark'] {
+    --primary: #2a9d8f;
+    --secondary: #00566a;
+    --dark: #f7fafc;
+    background-color: #1a202c;
+    color: white;
+  }
