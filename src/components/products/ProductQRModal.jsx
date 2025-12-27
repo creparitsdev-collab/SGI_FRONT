@@ -213,11 +213,11 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
       className="m-0"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      classNames={{ wrapper: "overflow-hidden", backdrop: "bg-black/20" }}
+      classNames={{ backdrop: "bg-black/20" }}
       ref={targetRef}
       scrollBehavior="inside"
     >
-      <ModalContent className="bg-background max-h-[80dvh] flex flex-col">
+      <ModalContent className="bg-background max-h-[80dvh] flex flex-col no-scrollbar">
         {(onClose) => (
           <>
             <ModalHeader
@@ -235,7 +235,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                 Código QR del producto
               </p>
             </ModalHeader>
-            <ScrollShadow className="py-6 gap-6" hideScrollBar>
+            <ScrollShadow className="mx-4 py-6 gap-6">
               <div className="flex flex-col items-center gap-6 w-full">
                 <div className="bg-white p-1 rounded-lg shadow-large">
                   {isLoadingQr ? (
