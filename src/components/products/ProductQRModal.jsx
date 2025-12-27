@@ -216,7 +216,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
       classNames={{ backdrop: "bg-black/20" }}
       scrollBehavior="inside"
     >
-      <ModalContent className="bg-background max-h-[80dvh] flex flex-col no-scrollbar">
+      <ModalContent className="bg-background flex flex-col no-scrollbar">
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-2 pb-4 pt-4">
