@@ -214,16 +214,11 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       classNames={{ backdrop: "bg-black/20" }}
-      ref={targetRef}
-      scrollBehavior="inside"
     >
       <ModalContent className="bg-background max-h-[80dvh] flex flex-col no-scrollbar">
         {(onClose) => (
           <>
-            <ModalHeader
-              {...moveProps}
-              className="flex flex-col gap-2 pb-4 pt-4"
-            >
+            <ModalHeader className="flex flex-col gap-2 pb-4 pt-4">
               <div className="w-full flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <QrCodeFilled className="size-6 text-primary" />
@@ -235,7 +230,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                 Código QR del producto
               </p>
             </ModalHeader>
-            <ScrollShadow className="mx-4 py-6 gap-6">
+            <ModalBody className="no-scrollbar py-6 gap-6">
               <div className="flex flex-col items-center gap-6 w-full">
                 <div className="bg-white p-1 rounded-lg shadow-large">
                   {isLoadingQr ? (
@@ -252,7 +247,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                 </div>
 
-                <div className="w-full flex flex-col gap-2 bg-background-100 p-4 rounded-lg overflow-x-hidden">
+                <div className="w-full flex flex-col gap-2 bg-background-100 p-4 rounded-lg">
                   {isLoadingProduct && (
                     <div className="flex items-center justify-center gap-2 pb-1">
                       <Spinner color="primary" size="sm" />
@@ -482,7 +477,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                 </div>
               </div>
-            </ScrollShadow>
+            </ModalBody>
             <ModalFooter className="pt-0 pb-6 px-6">
               <Button
                 className="w-full tracking-wide font-medium data-[hover=true]:-translate-y-1"
