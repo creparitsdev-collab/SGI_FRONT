@@ -1,21 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es-MX">
   <head>
     <meta charset="UTF-8" />
 
-    <link href="/light-icon.svg" rel="icon" type="image/svg+xml" media="(prefers-color-scheme: light)">
-    <link href="/dark-icon.svg" rel="icon" type="image/svg+xml" media="(prefers-color-scheme: dark)">
+    <link
+      href="/light-icon.svg"
+      rel="icon"
+      type="image/svg+xml"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      href="/dark-icon.svg"
+      rel="icon"
+      type="image/svg+xml"
+      media="(prefers-color-scheme: dark)"
+    />
     <link rel="stylesheet" href="/src/index.css" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
-    <title>Nombre del sistema</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"
+    />
+    <title>SGI - Sistema de gestión de inventario</title>
 
     <script>
-      ;(function() {
-        const theme = localStorage.getItem('heroui-theme') 
-          || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        if (theme === 'dark') document.documentElement.classList.add('dark');
-      })()
+      (function () {
+        const theme =
+          localStorage.getItem("heroui-theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        if (theme === "dark") document.documentElement.classList.add("dark");
+      })();
     </script>
   </head>
   <body>

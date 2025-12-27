@@ -5,6 +5,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  ScrollShadow,
   Spinner,
   useDraggable,
 } from "@heroui/react";
@@ -234,7 +235,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                 Código QR del producto
               </p>
             </ModalHeader>
-            <ModalBody className="py-6 gap-6 no-scrollbar overflow-auto">
+            <ScrollShadow className="py-6 gap-6" hideScrollBar>
               <div className="flex flex-col items-center gap-6 w-full">
                 <div className="bg-white p-1 rounded-lg shadow-large">
                   {isLoadingQr ? (
@@ -481,7 +482,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                 </div>
               </div>
-            </ModalBody>
+            </ScrollShadow>
             <ModalFooter className="pt-0 pb-6 px-6">
               <Button
                 className="w-full tracking-wide font-medium data-[hover=true]:-translate-y-1"
