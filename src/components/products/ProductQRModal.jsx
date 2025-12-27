@@ -12,6 +12,7 @@ import { useRef, useState, useEffect } from "react";
 import { CloseButton } from "../CloseButton";
 import { QrCodeFilled, ArrowDownloadFilled } from "@fluentui/react-icons";
 import { getProductByQrHash, getQrCodeImage } from "../../service/product";
+import { formatDateLiteral, formatFriendlyDate } from "../../js/utils";
 
 export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
   const targetRef = useRef(null);
@@ -44,6 +45,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
       try {
         setIsLoadingProduct(true);
         const response = await getProductByQrHash(product.qrHash);
+
         const data = response?.data ?? response;
         if (!cancelled && data) {
           setProductDetail(data);
@@ -106,6 +108,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
       warehouseTypeId: "ID Tipo Almacén",
       warehouseTypeName: "Tipo Almacén",
       codigoProducto: "Código Producto",
+      codigo: "Código",
       numeroAnalisis: "N° Análisis",
       fecha: "Fecha Ingreso",
       fechaIngreso: "Fecha Ingreso",
@@ -121,6 +124,11 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
       qrHash: "Hash QR",
       createdAt: "Fecha Creación",
       updatedAt: "Fecha Actualización",
+      createdByUserName: "Creado por",
+      productStatusDescription: "Descripción del estado",
+      warehouseTypeCode: "Código tipo almacén",
+      stockCatalogueSku: "SKU del catálogo",
+      qrCodeId: "ID Código QR",
     };
 
     if (map[key]) return map[key];
@@ -153,6 +161,8 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
     "__proto__",
     "constructor",
     "prototype",
+    "createdByUserId",
+    "descuentos",
   ]);
 
   const renderedKeys = new Set([
@@ -189,7 +199,9 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
 
   const extraEntries = Object.entries(data || {})
     .filter(([key]) => !excludedExtraKeys.has(key) && !renderedKeys.has(key))
-    .filter(([, value]) => value !== null && value !== undefined && value !== "")
+    .filter(
+      ([, value]) => value !== null && value !== undefined && value !== ""
+    )
     .sort(([a], [b]) => a.localeCompare(b));
 
   return (
@@ -197,11 +209,12 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
       hideCloseButton
       size="lg"
       radius="lg"
-      className="my-0"
+      className="m-0"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       classNames={{ wrapper: "overflow-hidden", backdrop: "bg-black/20" }}
       ref={targetRef}
+      scrollBehavior="inside"
     >
       <ModalContent className="bg-background max-h-[80dvh] flex flex-col">
         {(onClose) => (
@@ -221,9 +234,9 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                 Código QR del producto
               </p>
             </ModalHeader>
-            <ModalBody className="py-6 gap-6 overflow-x-hidden overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary">
-              <div className="flex flex-col items-center gap-6 w-full overflow-x-hidden">
-                <div className="bg-white p-4 rounded-lg shadow-large">
+            <ModalBody className="py-6 gap-6 no-scrollbar">
+              <div className="flex flex-col items-center gap-6 w-full">
+                <div className="bg-white p-1 rounded-lg shadow-large">
                   {isLoadingQr ? (
                     <div className="w-64 h-64 flex items-center justify-center">
                       <Spinner color="primary" size="lg" />
@@ -249,7 +262,9 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                   {data?.id != null && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3] flex-shrink-0">ID:</p>
+                      <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
+                        ID:
+                      </p>
                       <p className="text-sm font-medium break-all text-right">
                         {data.id}
                       </p>
@@ -257,7 +272,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                   {data?.nombre && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3] flex-shrink-0">
+                      <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
                         Nombre:
                       </p>
                       <p className="text-sm font-medium break-all text-right">
@@ -266,7 +281,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                     </div>
                   )}
                   <div className="flex justify-between gap-4">
-                    <p className="text-sm text-[#c3c3c3] flex-shrink-0">
+                    <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
                       Lote:
                     </p>
                     <p className="text-sm font-medium break-all text-right">
@@ -274,8 +289,8 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                     </p>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <p className="text-sm text-[#c3c3c3] flex-shrink-0">
-                      Lote Proveedor:
+                    <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
+                      Lote proveedor:
                     </p>
                     <p className="text-sm font-medium break-all text-right">
                       {data?.loteProveedor}
@@ -283,7 +298,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   </div>
                   {data?.stockCatalogueName && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">Catálogo:</p>
+                      <p className="text-sm text-[#c3c3c3] w-40">Catálogo:</p>
                       <p className="text-sm font-medium break-all text-right">
                         {data.stockCatalogueName}
                       </p>
@@ -291,7 +306,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                   {data?.productStatusName && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">Estado:</p>
+                      <p className="text-sm text-[#c3c3c3] w-40">Estado:</p>
                       <p className="text-sm font-medium break-all text-right">
                         {data.productStatusName}
                       </p>
@@ -299,7 +314,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                   {data?.unitOfMeasurementName && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">Unidad:</p>
+                      <p className="text-sm text-[#c3c3c3] w-40">Unidad:</p>
                       <p className="text-sm font-medium break-all text-right">
                         {data.unitOfMeasurementName}
                         {data.unitOfMeasurementCode
@@ -310,8 +325,8 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                   {data?.warehouseTypeName && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">
-                        Tipo Almacén:
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Tipo almacén:
                       </p>
                       <p className="text-sm font-medium break-all text-right">
                         {data.warehouseTypeName}
@@ -321,8 +336,8 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
 
                   {data?.codigoProducto && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">
-                        Código Producto:
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Código producto:
                       </p>
                       <p className="text-sm font-medium break-all text-right">
                         {data.codigoProducto}
@@ -332,7 +347,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
 
                   {data?.numeroAnalisis && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">
+                      <p className="text-sm text-[#c3c3c3] w-40">
                         N° Análisis:
                       </p>
                       <p className="text-sm font-medium break-all text-right">
@@ -343,48 +358,52 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
 
                   {(data?.fecha || data?.fechaIngreso) && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">
-                        Fecha Ingreso:
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha ingreso:
                       </p>
                       <p className="text-sm font-medium break-all text-right">
-                        {data?.fecha ?? data?.fechaIngreso}
+                        {formatFriendlyDate(data?.fecha ?? data?.fechaIngreso)}
                       </p>
                     </div>
                   )}
 
                   {(data?.caducidad || data?.fechaCaducidad) && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">
-                        Fecha Caducidad:
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha caducidad:
                       </p>
                       <p className="text-sm font-medium break-all text-right">
-                        {data?.caducidad ?? data?.fechaCaducidad}
+                        {formatFriendlyDate(
+                          data?.caducidad ?? data?.fechaCaducidad
+                        )}
                       </p>
                     </div>
                   )}
 
                   {data?.reanalisis && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">
-                        Fecha Reanálisis:
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha reanálisis:
                       </p>
                       <p className="text-sm font-medium break-all text-right">
-                        {data.reanalisis}
+                        {formatFriendlyDate(data.reanalisis)}
                       </p>
                     </div>
                   )}
                   {(data?.muestreo || data?.fechaMuestreo) && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">
+                      <p className="text-sm text-[#c3c3c3] w-40">
                         Fecha muestreo:
                       </p>
                       <p className="text-sm font-medium break-all text-right">
-                        {data?.muestreo ?? data?.fechaMuestreo}
+                        {formatFriendlyDate(
+                          data?.muestreo ?? data?.fechaMuestreo
+                        )}
                       </p>
                     </div>
                   )}
                   <div className="flex justify-between gap-4">
-                    <p className="text-sm text-[#c3c3c3]">
+                    <p className="text-sm text-[#c3c3c3] w-40">
                       Cantidad Total:
                     </p>
                     <p className="text-sm font-medium break-all text-right">
@@ -392,7 +411,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                     </p>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <p className="text-sm text-[#c3c3c3]">
+                    <p className="text-sm text-[#c3c3c3] w-40">
                       N° Contenedores:
                     </p>
                     <p className="text-sm font-medium break-all text-right">
@@ -401,7 +420,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   </div>
                   {data?.fabricante && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">Fabricante:</p>
+                      <p className="text-sm text-[#c3c3c3] w-40">Fabricante:</p>
                       <p className="text-sm font-medium break-all text-right">
                         {data.fabricante}
                       </p>
@@ -409,7 +428,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                   {data?.distribuidor && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">
+                      <p className="text-sm text-[#c3c3c3] w-40">
                         Distribuidor:
                       </p>
                       <p className="text-sm font-medium break-all text-right">
@@ -419,7 +438,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                   {data?.qrHash && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">Hash QR:</p>
+                      <p className="text-sm text-[#c3c3c3] w-40">Hash QR:</p>
                       <p className="text-sm font-medium break-all text-right">
                         {data.qrHash}
                       </p>
@@ -427,19 +446,21 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                   )}
                   {data?.createdAt && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">Fecha Creación:</p>
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha creación:
+                      </p>
                       <p className="text-sm font-medium break-all text-right">
-                        {data.createdAt}
+                        {formatDateLiteral(data.createdAt, true)}
                       </p>
                     </div>
                   )}
                   {data?.updatedAt && (
                     <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3]">
-                        Fecha Actualización:
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha actualización:
                       </p>
                       <p className="text-sm font-medium break-all text-right">
-                        {data.updatedAt}
+                        {formatDateLiteral(data.updatedAt, true)}
                       </p>
                     </div>
                   )}
@@ -448,7 +469,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                     <div className="flex flex-col gap-2">
                       {extraEntries.map(([key, value]) => (
                         <div key={key} className="flex justify-between gap-4">
-                          <p className="text-sm text-[#c3c3c3] flex-shrink-0">
+                          <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
                             {formatExtraLabel(key)}:
                           </p>
                           <p className="text-sm font-medium break-all text-right">

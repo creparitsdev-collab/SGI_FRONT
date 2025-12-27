@@ -77,7 +77,8 @@ export const ProductsDrawer = ({
       data?.numeroAnalisis != null ? String(data.numeroAnalisis) : "",
     fechaIngreso: data?.fecha != null ? String(data.fecha) : "",
     fechaCaducidad: data?.caducidad != null ? String(data.caducidad) : "",
-    muestreo: data?.fechaMuestreo != null ? String(data.fechaMuestreo) : "",
+    fechaMuestreo:
+      data?.fechaMuestreo != null ? String(data.fechaMuestreo) : "",
     reanalisis: data?.reanalisis != null ? String(data.reanalisis) : "",
     cantidadTotal:
       data?.cantidadTotal != null ? String(data.cantidadTotal) : "",
@@ -99,7 +100,7 @@ export const ProductsDrawer = ({
     numeroAnalisis: [],
     fechaIngreso: [],
     fechaCaducidad: [],
-    muestreo: [],
+    fechaMuestreo: [],
     reanalisis: [],
     cantidadTotal: [],
     numeroContenedores: [],
@@ -160,7 +161,8 @@ export const ProductsDrawer = ({
         data?.numeroAnalisis != null ? String(data.numeroAnalisis) : "",
       fechaIngreso: data?.fecha != null ? String(data.fecha) : "",
       fechaCaducidad: data?.caducidad != null ? String(data.caducidad) : "",
-      muestreo: data?.fechaMuestreo != null ? String(data.fechaMuestreo) : "",
+      fechaMuestreo:
+        data?.fechaMuestreo != null ? String(data.fechaMuestreo) : "",
       reanalisis: data?.reanalisis != null ? String(data.reanalisis) : "",
       cantidadTotal:
         data?.cantidadTotal != null ? String(data.cantidadTotal) : "",
@@ -181,7 +183,7 @@ export const ProductsDrawer = ({
       numeroAnalisis: [],
       fechaIngreso: [],
       fechaCaducidad: [],
-      muestreo: [],
+      fechaMuestreo: [],
       reanalisis: [],
       cantidadTotal: [],
       numeroContenedores: [],
@@ -209,7 +211,7 @@ export const ProductsDrawer = ({
       numeroAnalisis: "",
       fechaIngreso: "",
       fechaCaducidad: "",
-      muestreo: "",
+      fechaMuestreo: "",
       reanalisis: "",
       cantidadTotal: "",
       numeroContenedores: "",
@@ -228,7 +230,7 @@ export const ProductsDrawer = ({
       numeroAnalisis: [],
       fechaIngreso: [],
       fechaCaducidad: [],
-      muestreo: [],
+      fechaMuestreo: [],
       reanalisis: [],
       cantidadTotal: [],
       numeroContenedores: [],
@@ -315,7 +317,7 @@ export const ProductsDrawer = ({
     numeroAnalisis: [required],
     fechaIngreso: [required],
     fechaCaducidad: [],
-    muestreo: [],
+    fechaMuestreo: [],
     reanalisis: [],
     cantidadTotal: [required],
     numeroContenedores: [required],
@@ -462,7 +464,7 @@ export const ProductsDrawer = ({
       numeroAnalisis: [],
       fechaIngreso: [],
       fechaCaducidad: [],
-      muestreo: [],
+      fechaMuestreo: [],
       reanalisis: [],
       cantidadTotal: [],
       numeroContenedores: [],
@@ -968,208 +970,202 @@ export const ProductsDrawer = ({
                     }
                   />
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <Input
-                      label={
-                        <div className="flex items-center gap-1">
-                          <p className="font-medium text-sm">
-                            Fecha de Ingreso
-                          </p>
-                          <TextAsteriskFilled className="size-3 text-background-500 group-data-[focus=true]:text-primary group-data-[invalid=true]:!text-danger" />
-                        </div>
-                      }
-                      classNames={{
-                        label:
-                          "font-medium !text-current transition-colors !duration-1000 ease-in-out",
-                        input: `transition-colors !duration-1000 ease-in-out font-medium !placeholder-background-500 placeholder:!font-normal ${
-                          (action === "create" || action === "update") &&
-                          !product.fechaIngreso
-                            ? "text-background-500 focus:text-current"
-                            : "text-current"
-                        }`,
-                        inputWrapper:
-                          "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 group-data-[hover=true]:border-background-200 group-data-[focus=true]:!border-primary border-transparent text-current py-1",
-                      }}
-                      name="fechaIngreso"
-                      labelPlacement="outside"
-                      type={
-                        action === "create" || action === "update"
-                          ? "date"
-                          : "text"
-                      }
-                      radius="sm"
-                      variant="bordered"
-                      isReadOnly={action !== "create" && action !== "update"}
-                      value={
-                        action === "create" || action === "update"
-                          ? product.fechaIngreso
-                          : formatDateShort(product.fechaIngreso)
-                      }
-                      onValueChange={(value) =>
-                        handleInputChange("fechaIngreso", value)
-                      }
-                      isInvalid={productErrors.fechaIngreso.length > 0}
-                      errorMessage={() => (
-                        <div className="flex text-danger">
-                          <ul>
-                            {productErrors.fechaIngreso.map((error, i) => (
-                              <li key={i}>{error}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    />
+                  <Input
+                    label={
+                      <div className="flex items-center gap-1">
+                        <p className="font-medium text-sm">Fecha de Ingreso</p>
+                        <TextAsteriskFilled className="size-3 text-background-500 group-data-[focus=true]:text-primary group-data-[invalid=true]:!text-danger" />
+                      </div>
+                    }
+                    classNames={{
+                      label:
+                        "font-medium !text-current transition-colors !duration-1000 ease-in-out",
+                      input: `transition-colors !duration-1000 ease-in-out font-medium !placeholder-background-500 placeholder:!font-normal ${
+                        (action === "create" || action === "update") &&
+                        !product.fechaIngreso
+                          ? "text-background-500 focus:text-current"
+                          : "text-current"
+                      }`,
+                      inputWrapper:
+                        "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 group-data-[hover=true]:border-background-200 group-data-[focus=true]:!border-primary border-transparent text-current py-1",
+                    }}
+                    name="fechaIngreso"
+                    labelPlacement="outside"
+                    type={
+                      action === "create" || action === "update"
+                        ? "date"
+                        : "text"
+                    }
+                    radius="sm"
+                    variant="bordered"
+                    isReadOnly={action !== "create" && action !== "update"}
+                    value={
+                      action === "create" || action === "update"
+                        ? product.fechaIngreso
+                        : formatDateShort(product.fechaIngreso)
+                    }
+                    onValueChange={(value) =>
+                      handleInputChange("fechaIngreso", value)
+                    }
+                    isInvalid={productErrors.fechaIngreso.length > 0}
+                    errorMessage={() => (
+                      <div className="flex text-danger">
+                        <ul>
+                          {productErrors.fechaIngreso.map((error, i) => (
+                            <li key={i}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  />
 
-                    <Input
-                      label={
-                        <div className="flex items-center gap-1">
-                          <p className="font-medium text-sm">
-                            Fecha de Caducidad
-                          </p>
-                        </div>
-                      }
-                      classNames={{
-                        label:
-                          "font-medium !text-current transition-colors !duration-1000 ease-in-out",
-                        input: `transition-colors !duration-1000 ease-in-out font-medium !placeholder-background-500 placeholder:!font-normal ${
-                          (action === "create" || action === "update") &&
-                          !product.fechaCaducidad
-                            ? "text-background-500 focus:text-current"
-                            : "text-current"
-                        }`,
-                        inputWrapper:
-                          "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 group-data-[hover=true]:border-background-200 group-data-[focus=true]:!border-primary border-transparent text-current py-1",
-                      }}
-                      name="fechaCaducidad"
-                      labelPlacement="outside"
-                      type={
-                        action === "create" || action === "update"
-                          ? "date"
-                          : "text"
-                      }
-                      radius="sm"
-                      variant="bordered"
-                      isReadOnly={action !== "create" && action !== "update"}
-                      value={
-                        action === "create" || action === "update"
-                          ? product.fechaCaducidad
-                          : formatDateShort(product.fechaCaducidad)
-                      }
-                      onValueChange={(value) =>
-                        handleInputChange("fechaCaducidad", value)
-                      }
-                      isInvalid={productErrors.fechaCaducidad.length > 0}
-                      errorMessage={() => (
-                        <div className="flex text-danger">
-                          <ul>
-                            {productErrors.fechaCaducidad.map((error, i) => (
-                              <li key={i}>{error}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    />
+                  <Input
+                    label={
+                      <div className="flex items-center gap-1">
+                        <p className="font-medium text-sm">
+                          Fecha de Caducidad
+                        </p>
+                      </div>
+                    }
+                    classNames={{
+                      label:
+                        "font-medium !text-current transition-colors !duration-1000 ease-in-out",
+                      input: `transition-colors !duration-1000 ease-in-out font-medium !placeholder-background-500 placeholder:!font-normal ${
+                        (action === "create" || action === "update") &&
+                        !product.fechaCaducidad
+                          ? "text-background-500 focus:text-current"
+                          : "text-current"
+                      }`,
+                      inputWrapper:
+                        "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 group-data-[hover=true]:border-background-200 group-data-[focus=true]:!border-primary border-transparent text-current py-1",
+                    }}
+                    name="fechaCaducidad"
+                    labelPlacement="outside"
+                    type={
+                      action === "create" || action === "update"
+                        ? "date"
+                        : "text"
+                    }
+                    radius="sm"
+                    variant="bordered"
+                    isReadOnly={action !== "create" && action !== "update"}
+                    value={
+                      action === "create" || action === "update"
+                        ? product.fechaCaducidad
+                        : formatDateShort(product.fechaCaducidad)
+                    }
+                    onValueChange={(value) =>
+                      handleInputChange("fechaCaducidad", value)
+                    }
+                    isInvalid={productErrors.fechaCaducidad.length > 0}
+                    errorMessage={() => (
+                      <div className="flex text-danger">
+                        <ul>
+                          {productErrors.fechaCaducidad.map((error, i) => (
+                            <li key={i}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  />
 
-                    <Input
-                      className="sm:col-span-2"
-                      label={
-                        <div className="flex items-center gap-1">
-                          <p className="font-medium text-sm">
-                            Fecha Reanálisis
-                          </p>
-                        </div>
-                      }
-                      classNames={{
-                        label:
-                          "font-medium !text-current transition-colors !duration-1000 ease-in-out",
-                        input: `transition-colors !duration-1000 ease-in-out font-medium !placeholder-background-500 placeholder:!font-normal ${
-                          (action === "create" || action === "update") &&
-                          !product.reanalisis
-                            ? "text-background-500 focus:text-current"
-                            : "text-current"
-                        }`,
-                        inputWrapper:
-                          "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 group-data-[hover=true]:border-background-200 group-data-[focus=true]:!border-primary border-transparent text-current py-1",
-                      }}
-                      name="reanalisis"
-                      labelPlacement="outside"
-                      type={
-                        action === "create" || action === "update"
-                          ? "date"
-                          : "text"
-                      }
-                      radius="sm"
-                      variant="bordered"
-                      isReadOnly={action !== "create" && action !== "update"}
-                      value={
-                        action === "create" || action === "update"
-                          ? product.reanalisis || ""
-                          : formatDateShort(product.reanalisis)
-                      }
-                      onValueChange={(value) =>
-                        handleInputChange("reanalisis", value)
-                      }
-                      isInvalid={productErrors.reanalisis.length > 0}
-                      errorMessage={() => (
-                        <div className="flex text-danger">
-                          <ul>
-                            {productErrors.reanalisis.map((error, i) => (
-                              <li key={i}>{error}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    />
+                  <Input
+                    className="sm:col-span-2"
+                    label={
+                      <div className="flex items-center gap-1">
+                        <p className="font-medium text-sm">Fecha Reanálisis</p>
+                      </div>
+                    }
+                    classNames={{
+                      label:
+                        "font-medium !text-current transition-colors !duration-1000 ease-in-out",
+                      input: `transition-colors !duration-1000 ease-in-out font-medium !placeholder-background-500 placeholder:!font-normal ${
+                        (action === "create" || action === "update") &&
+                        !product.reanalisis
+                          ? "text-background-500 focus:text-current"
+                          : "text-current"
+                      }`,
+                      inputWrapper:
+                        "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 group-data-[hover=true]:border-background-200 group-data-[focus=true]:!border-primary border-transparent text-current py-1",
+                    }}
+                    name="reanalisis"
+                    labelPlacement="outside"
+                    type={
+                      action === "create" || action === "update"
+                        ? "date"
+                        : "text"
+                    }
+                    radius="sm"
+                    variant="bordered"
+                    isReadOnly={action !== "create" && action !== "update"}
+                    value={
+                      action === "create" || action === "update"
+                        ? product.reanalisis || ""
+                        : formatDateShort(product.reanalisis)
+                    }
+                    onValueChange={(value) =>
+                      handleInputChange("reanalisis", value)
+                    }
+                    isInvalid={productErrors.reanalisis.length > 0}
+                    errorMessage={() => (
+                      <div className="flex text-danger">
+                        <ul>
+                          {productErrors.reanalisis.map((error, i) => (
+                            <li key={i}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  />
 
-                    <Input
-                      className="sm:col-span-2"
-                      label={
-                        <div className="flex items-center gap-1">
-                          <p className="font-medium text-sm">Fecha muestreo</p>
-                        </div>
-                      }
-                      classNames={{
-                        label:
-                          "font-medium !text-current transition-colors !duration-1000 ease-in-out",
-                        input: `transition-colors !duration-1000 ease-in-out font-medium !placeholder-background-500 placeholder:!font-normal ${
-                          (action === "create" || action === "update") &&
-                          !product.muestreo
-                            ? "text-background-500 focus:text-current"
-                            : "text-current"
-                        }`,
-                        inputWrapper:
-                          "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 group-data-[hover=true]:border-background-200 group-data-[focus=true]:!border-primary border-transparent text-current py-1",
-                      }}
-                      name="muestreo"
-                      labelPlacement="outside"
-                      type={
-                        action === "create" || action === "update"
-                          ? "date"
-                          : "text"
-                      }
-                      radius="sm"
-                      variant="bordered"
-                      isReadOnly={action !== "create" && action !== "update"}
-                      value={
-                        action === "create" || action === "update"
-                          ? product.muestreo || ""
-                          : formatDateShort(product.muestreo)
-                      }
-                      onValueChange={(value) =>
-                        handleInputChange("muestreo", value)
-                      }
-                      isInvalid={productErrors.muestreo.length > 0}
-                      errorMessage={() => (
-                        <div className="flex text-danger">
-                          <ul>
-                            {productErrors.muestreo.map((error, i) => (
-                              <li key={i}>{error}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    />
-                  </div>
+                  <Input
+                    className="sm:col-span-2"
+                    label={
+                      <div className="flex items-center gap-1">
+                        <p className="font-medium text-sm">Fecha muestreo</p>
+                      </div>
+                    }
+                    classNames={{
+                      label:
+                        "font-medium !text-current transition-colors !duration-1000 ease-in-out",
+                      input: `transition-colors !duration-1000 ease-in-out font-medium !placeholder-background-500 placeholder:!font-normal ${
+                        (action === "create" || action === "update") &&
+                        !product.fechaMuestreo
+                          ? "text-background-500 focus:text-current"
+                          : "text-current"
+                      }`,
+                      inputWrapper:
+                        "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 group-data-[hover=true]:border-background-200 group-data-[focus=true]:!border-primary border-transparent text-current py-1",
+                    }}
+                    name="fechaMuestreo"
+                    labelPlacement="outside"
+                    type={
+                      action === "create" || action === "update"
+                        ? "date"
+                        : "text"
+                    }
+                    radius="sm"
+                    variant="bordered"
+                    isReadOnly={action !== "create" && action !== "update"}
+                    value={
+                      action === "create" || action === "update"
+                        ? product.fechaMuestreo || ""
+                        : formatDateShort(product.fechaMuestreo)
+                    }
+                    onValueChange={(value) =>
+                      handleInputChange("fechaMuestreo", value)
+                    }
+                    isInvalid={productErrors.fechaMuestreo.length > 0}
+                    errorMessage={() => (
+                      <div className="flex text-danger">
+                        <ul>
+                          {productErrors.fechaMuestreo.map((error, i) => (
+                            <li key={i}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  />
 
                   <Select
                     aria-label="Unidad de Medida"

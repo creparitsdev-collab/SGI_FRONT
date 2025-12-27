@@ -101,7 +101,7 @@ export const ProductsModal = ({
         fechaIngreso: data.fechaIngreso,
         fechaCaducidad: data.fechaCaducidad,
         reanalisis: data.reanalisis,
-        muestreo: data.fechaMuestreo,
+        fechaMuestreo: data.fechaMuestreo,
         cantidadTotal: parseInt(data.cantidadTotal),
         numeroContenedores: parseInt(data.numeroContenedores),
       };
@@ -233,7 +233,7 @@ export const ProductsModal = ({
             </p>
             <p className="text-sm break-all">
               <span className="font-medium">Fecha muestreo: </span>
-              {formatDateShort(product.muestreo)}
+              {formatDateShort(product.fechaMuestreo)}
             </p>
             {product.unitOfMeasurementName && (
               <p className="text-sm break-all">
