@@ -210,13 +210,12 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
       hideCloseButton
       size="lg"
       radius="lg"
-      className="m-0"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       classNames={{ backdrop: "bg-black/20" }}
       scrollBehavior="inside"
     >
-      <ModalContent className="bg-background flex flex-col no-scrollbar">
+      <ModalContent className="bg-background">
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-2 pb-4 pt-4">
