@@ -213,7 +213,9 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       classNames={{ backdrop: "bg-black/20" }}
-      scrollBehavior="outside"
+      scrollBehavior="inside"
+      isDismissable={false}
+      isKeyboardDismissDisabled={true}
     >
       <ModalContent className="bg-background">
         {(onClose) => (
@@ -231,8 +233,11 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
               </p>
             </ModalHeader>
             <ModalBody
-              className="touch-pan-y py-6 gap-6 overflow-y-auto! [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-              style={{ touchAction: "pan-y" }}
+              className="py-6 gap-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              style={{
+                touchAction: "pan-y", // Dice al navegador: "Aquí sí se permite deslizar verticalmente"
+                WebkitOverflowScrolling: "touch", // Inercia nativa en iOS
+              }}
             >
               <div className="flex flex-col items-center gap-6 w-full">
                 <div className="bg-white p-1 rounded-lg shadow-large">
