@@ -230,7 +230,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                 Código QR del producto
               </p>
             </ModalHeader>
-            <ModalBody className="no-scrollbar py-6 gap-6">
+            <ModalBody className="py-6 gap-6">
               <div className="flex flex-col items-center gap-6 w-full">
                 <div className="bg-white p-1 rounded-lg shadow-large">
                   {isLoadingQr ? (
