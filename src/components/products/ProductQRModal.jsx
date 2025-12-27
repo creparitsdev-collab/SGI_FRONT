@@ -230,264 +230,253 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
                 Código QR del producto
               </p>
             </ModalHeader>
-            <ModalBody className="py-6">
-              <ScrollShadow
-                className="flex flex-col gap-6 w-full"
-                hideScrollBar
-              >
-                <div className="flex flex-col items-center gap-6 w-full">
-                  <div className="bg-white p-1 rounded-lg shadow-large">
-                    {isLoadingQr ? (
-                      <div className="w-64 h-64 flex items-center justify-center">
-                        <Spinner color="primary" size="lg" />
-                      </div>
-                    ) : qrImage ? (
-                      <img src={qrImage} alt="QR Code" className="w-64 h-64" />
-                    ) : (
-                      <div className="w-64 h-64 flex flex-col items-center justify-center bg-background-100 rounded-lg">
-                        <QrCodeFilled className="size-16 text-background-500" />
-                        <p className="text-background-500 mt-4">
-                          No disponible
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="w-full flex flex-col gap-2 bg-background-100 p-4 rounded-lg">
-                    {isLoadingProduct && (
-                      <div className="flex items-center justify-center gap-2 pb-1">
-                        <Spinner color="primary" size="sm" />
-                        <p className="text-sm text-[#c3c3c3]">
-                          Cargando datos del producto...
-                        </p>
-                      </div>
-                    )}
-                    {data?.id != null && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
-                          ID:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.id}
-                        </p>
-                      </div>
-                    )}
-                    {data?.nombre && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
-                          Nombre:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.nombre}
-                        </p>
-                      </div>
-                    )}
-                    <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
-                        Lote:
-                      </p>
-                      <p className="text-sm font-medium break-all text-right">
-                        {data?.lote}
-                      </p>
+            <ModalBody className="py-6 gap-6 overflow-y-auto! [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="flex flex-col items-center gap-6 w-full">
+                <div className="bg-white p-1 rounded-lg shadow-large">
+                  {isLoadingQr ? (
+                    <div className="w-64 h-64 flex items-center justify-center">
+                      <Spinner color="primary" size="lg" />
                     </div>
-                    <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
-                        Lote proveedor:
-                      </p>
-                      <p className="text-sm font-medium break-all text-right">
-                        {data?.loteProveedor}
-                      </p>
+                  ) : qrImage ? (
+                    <img src={qrImage} alt="QR Code" className="w-64 h-64" />
+                  ) : (
+                    <div className="w-64 h-64 flex flex-col items-center justify-center bg-background-100 rounded-lg">
+                      <QrCodeFilled className="size-16 text-background-500" />
+                      <p className="text-background-500 mt-4">No disponible</p>
                     </div>
-                    {data?.stockCatalogueName && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">Catálogo:</p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.stockCatalogueName}
-                        </p>
-                      </div>
-                    )}
-                    {data?.productStatusName && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">Estado:</p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.productStatusName}
-                        </p>
-                      </div>
-                    )}
-                    {data?.unitOfMeasurementName && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">Unidad:</p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.unitOfMeasurementName}
-                          {data.unitOfMeasurementCode
-                            ? ` (${data.unitOfMeasurementCode})`
-                            : ""}
-                        </p>
-                      </div>
-                    )}
-                    {data?.warehouseTypeName && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          Tipo almacén:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.warehouseTypeName}
-                        </p>
-                      </div>
-                    )}
-
-                    {data?.codigoProducto && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          Código producto:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.codigoProducto}
-                        </p>
-                      </div>
-                    )}
-
-                    {data?.numeroAnalisis && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          N° Análisis:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.numeroAnalisis}
-                        </p>
-                      </div>
-                    )}
-
-                    {(data?.fecha || data?.fechaIngreso) && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          Fecha ingreso:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {formatFriendlyDate(
-                            data?.fecha ?? data?.fechaIngreso
-                          )}
-                        </p>
-                      </div>
-                    )}
-
-                    {(data?.caducidad || data?.fechaCaducidad) && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          Fecha caducidad:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {formatFriendlyDate(
-                            data?.caducidad ?? data?.fechaCaducidad
-                          )}
-                        </p>
-                      </div>
-                    )}
-
-                    {data?.reanalisis && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          Fecha reanálisis:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {formatFriendlyDate(data.reanalisis)}
-                        </p>
-                      </div>
-                    )}
-                    {(data?.muestreo || data?.fechaMuestreo) && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          Fecha muestreo:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {formatFriendlyDate(
-                            data?.muestreo ?? data?.fechaMuestreo
-                          )}
-                        </p>
-                      </div>
-                    )}
-                    <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3] w-40">
-                        Cantidad Total:
-                      </p>
-                      <p className="text-sm font-medium break-all text-right">
-                        {data?.cantidadTotal}
-                      </p>
-                    </div>
-                    <div className="flex justify-between gap-4">
-                      <p className="text-sm text-[#c3c3c3] w-40">
-                        N° Contenedores:
-                      </p>
-                      <p className="text-sm font-medium break-all text-right">
-                        {data?.numeroContenedores}
-                      </p>
-                    </div>
-                    {data?.fabricante && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          Fabricante:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.fabricante}
-                        </p>
-                      </div>
-                    )}
-                    {data?.distribuidor && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          Distribuidor:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.distribuidor}
-                        </p>
-                      </div>
-                    )}
-                    {data?.qrHash && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">Hash QR:</p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {data.qrHash}
-                        </p>
-                      </div>
-                    )}
-                    {data?.createdAt && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          Fecha creación:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {formatDateLiteral(data.createdAt, true)}
-                        </p>
-                      </div>
-                    )}
-                    {data?.updatedAt && (
-                      <div className="flex justify-between gap-4">
-                        <p className="text-sm text-[#c3c3c3] w-40">
-                          Fecha actualización:
-                        </p>
-                        <p className="text-sm font-medium break-all text-right">
-                          {formatDateLiteral(data.updatedAt, true)}
-                        </p>
-                      </div>
-                    )}
-
-                    {extraEntries.length > 0 && (
-                      <div className="flex flex-col gap-2">
-                        {extraEntries.map(([key, value]) => (
-                          <div key={key} className="flex justify-between gap-4">
-                            <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
-                              {formatExtraLabel(key)}:
-                            </p>
-                            <p className="text-sm font-medium break-all text-right">
-                              {formatExtraValue(value)}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
-              </ScrollShadow>
+
+                <div className="w-full flex flex-col gap-2 bg-background-100 p-4 rounded-lg">
+                  {isLoadingProduct && (
+                    <div className="flex items-center justify-center gap-2 pb-1">
+                      <Spinner color="primary" size="sm" />
+                      <p className="text-sm text-[#c3c3c3]">
+                        Cargando datos del producto...
+                      </p>
+                    </div>
+                  )}
+                  {data?.id != null && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
+                        ID:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.id}
+                      </p>
+                    </div>
+                  )}
+                  {data?.nombre && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
+                        Nombre:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.nombre}
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex justify-between gap-4">
+                    <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
+                      Lote:
+                    </p>
+                    <p className="text-sm font-medium break-all text-right">
+                      {data?.lote}
+                    </p>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
+                      Lote proveedor:
+                    </p>
+                    <p className="text-sm font-medium break-all text-right">
+                      {data?.loteProveedor}
+                    </p>
+                  </div>
+                  {data?.stockCatalogueName && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">Catálogo:</p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.stockCatalogueName}
+                      </p>
+                    </div>
+                  )}
+                  {data?.productStatusName && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">Estado:</p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.productStatusName}
+                      </p>
+                    </div>
+                  )}
+                  {data?.unitOfMeasurementName && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">Unidad:</p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.unitOfMeasurementName}
+                        {data.unitOfMeasurementCode
+                          ? ` (${data.unitOfMeasurementCode})`
+                          : ""}
+                      </p>
+                    </div>
+                  )}
+                  {data?.warehouseTypeName && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Tipo almacén:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.warehouseTypeName}
+                      </p>
+                    </div>
+                  )}
+
+                  {data?.codigoProducto && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Código producto:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.codigoProducto}
+                      </p>
+                    </div>
+                  )}
+
+                  {data?.numeroAnalisis && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        N° Análisis:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.numeroAnalisis}
+                      </p>
+                    </div>
+                  )}
+
+                  {(data?.fecha || data?.fechaIngreso) && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha ingreso:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {formatFriendlyDate(data?.fecha ?? data?.fechaIngreso)}
+                      </p>
+                    </div>
+                  )}
+
+                  {(data?.caducidad || data?.fechaCaducidad) && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha caducidad:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {formatFriendlyDate(
+                          data?.caducidad ?? data?.fechaCaducidad
+                        )}
+                      </p>
+                    </div>
+                  )}
+
+                  {data?.reanalisis && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha reanálisis:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {formatFriendlyDate(data.reanalisis)}
+                      </p>
+                    </div>
+                  )}
+                  {(data?.muestreo || data?.fechaMuestreo) && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha muestreo:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {formatFriendlyDate(
+                          data?.muestreo ?? data?.fechaMuestreo
+                        )}
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex justify-between gap-4">
+                    <p className="text-sm text-[#c3c3c3] w-40">
+                      Cantidad Total:
+                    </p>
+                    <p className="text-sm font-medium break-all text-right">
+                      {data?.cantidadTotal}
+                    </p>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <p className="text-sm text-[#c3c3c3] w-40">
+                      N° Contenedores:
+                    </p>
+                    <p className="text-sm font-medium break-all text-right">
+                      {data?.numeroContenedores}
+                    </p>
+                  </div>
+                  {data?.fabricante && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">Fabricante:</p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.fabricante}
+                      </p>
+                    </div>
+                  )}
+                  {data?.distribuidor && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Distribuidor:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.distribuidor}
+                      </p>
+                    </div>
+                  )}
+                  {data?.qrHash && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">Hash QR:</p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {data.qrHash}
+                      </p>
+                    </div>
+                  )}
+                  {data?.createdAt && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha creación:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {formatDateLiteral(data.createdAt, true)}
+                      </p>
+                    </div>
+                  )}
+                  {data?.updatedAt && (
+                    <div className="flex justify-between gap-4">
+                      <p className="text-sm text-[#c3c3c3] w-40">
+                        Fecha actualización:
+                      </p>
+                      <p className="text-sm font-medium break-all text-right">
+                        {formatDateLiteral(data.updatedAt, true)}
+                      </p>
+                    </div>
+                  )}
+
+                  {extraEntries.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      {extraEntries.map(([key, value]) => (
+                        <div key={key} className="flex justify-between gap-4">
+                          <p className="text-sm text-[#c3c3c3] flex-shrink-0 w-40">
+                            {formatExtraLabel(key)}:
+                          </p>
+                          <p className="text-sm font-medium break-all text-right">
+                            {formatExtraValue(value)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </ModalBody>
             <ModalFooter className="pt-0 pb-6 px-6">
               <Button
