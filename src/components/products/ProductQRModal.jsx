@@ -212,8 +212,7 @@ export const ProductQRModal = ({ isOpen, onOpenChange, product }) => {
       radius="lg"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      classNames={{ backdrop: "bg-black/20" }}
-      scrollBehavior="inside"
+      classNames={{ backdrop: "bg-black/20", body: "overflow-y-auto" }}
     >
       <ModalContent className="bg-background">
         {(onClose) => (
