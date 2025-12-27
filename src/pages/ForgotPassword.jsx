@@ -1,16 +1,20 @@
 import { ArrowHookUpLeftFilled, ArrowHookUpRightFilled, CheckmarkFilled, DismissFilled, EditFilled, EyeFilled, EyeOffFilled, TextAsteriskFilled } from "@fluentui/react-icons"
 import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDraggable } from "@heroui/react"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router"
 import { isValidUUID } from "../js/validators"
+import { forgotPassword, resetPassword, validateResetToken } from "../service/auth"
 
 export const ForgotPassword = () => {
     const [isOpen, setIsOpen] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
     const [wasSent, setWasSent] = useState(false)
+    const [wasUpdated, setWasUpdated] = useState(false)
     const [email, setEmail] = useState("")
     const [emailError, setEmailError] = useState("")
     const [cPErrors, setCPErrors] = useState({}) 
+    const [tokenChecked, setTokenChecked] = useState(false)
+    const [tokenValid, setTokenValid] = useState(false)
 
     const [isNewPVisible, setIsNewPVisible] = useState(false)
     
@@ -19,6 +23,8 @@ export const ForgotPassword = () => {
     const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{}|;:,.<>?])[A-Za-z0-9!@#$%^&*()_+\-=[\]{}|;:,.<>?]{8,}$/
 
     const { token } = useParams()
+
+    const navigate = useNavigate()
 
     const targetRef = useRef(null)
     const {moveProps} = useDraggable({targetRef, isDisabled: !isOpen})
@@ -38,6 +44,28 @@ export const ForgotPassword = () => {
         setEmailError(validateEmail(value))
     }
 
+    useEffect(() => {
+        const run = async () => {
+            if (!token) return
+            if (!isValidUUID(token)) {
+                setTokenChecked(true)
+                setTokenValid(false)
+                return
+            }
+            setIsLoading(true)
+            try {
+                await validateResetToken(token)
+                setTokenValid(true)
+            } catch (e) {
+                setTokenValid(false)
+            } finally {
+                setTokenChecked(true)
+                setIsLoading(false)
+            }
+        }
+        run()
+    }, [token])
+
     const onSubmit = async (e) => {
         e.preventDefault()
 
@@ -48,37 +76,116 @@ export const ForgotPassword = () => {
         
         const data = Object.fromEntries(new FormData(e.currentTarget))    
         
-        // llamada a la api
-        console.log(data)
-
-        setWasSent(true)
+        setIsLoading(true)
+        try {
+            await forgotPassword({ email: (data.email || "").trim() })
+            setWasSent(true)
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     const onSubmitChangePassword = async (e) => {
         e.preventDefault()
 
-        const data = Object.fromEntries(new FormData(e.currentTarget))    
-        console.log(data)
-        alert(data)
+        const data = Object.fromEntries(new FormData(e.currentTarget))
+        const newPassword = (data.newPassword || "").toString()
+        const currentToken = (data.token || "").toString()
+
+        if (!passwordRegex.test(newPassword)) {
+            setCPErrors({ newPassword: "La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula y un carácter especial." })
+            return
+        }
+        setCPErrors({})
+
+        setIsLoading(true)
+        try {
+            await resetPassword({ token: currentToken, newPassword })
+            setWasUpdated(true)
+        } finally {
+            setIsLoading(false)
+        }
     }
 
-    return (
-        <>
-            {token ? (
-                isValidUUID(token) 
-                    ?   <Modal
-                            hideCloseButton
-                            size="md"
-                            radius="lg"
-                            isKeyboardDismissDisabled
-                            isDismissable={false}
-                            isOpen={isOpen}
-                            onOpenChange={setIsOpen}
-                            classNames={{wrapper: "overflow-hidden", backdrop: "bg-black/20"}}
-                            ref={targetRef} 
-                            className="my-0"
-                        >
-                            <ModalContent className="bg-background">
+    let content = null
+
+    if (token) {
+        if (!isValidUUID(token)) {
+            content = (
+                <Modal
+                    hideCloseButton
+                    size="md"
+                    radius="lg"
+                    isKeyboardDismissDisabled
+                    isDismissable={false}
+                    isOpen={isOpen}
+                    onOpenChange={setIsOpen}
+                    classNames={{wrapper: "overflow-hidden", backdrop: "bg-black/20"}}
+                    ref={targetRef} 
+                    className="my-0"
+                >
+                    <ModalContent className="bg-background">
+                        <ModalHeader {...moveProps} className="flex flex-col gap-2 pb-4 pt-8">
+                            <p className="text-lg font-bold text-center">Token inválido</p>
+                        </ModalHeader>
+                        <ModalBody className="py-0 gap-0">
+                            <p className="text-sm font-normal pb-4 text-center">El token proporcionado no cuenta con un formato correcto, por favor, inténtelo de nuevo</p>
+                        </ModalBody>
+                        <ModalFooter className="flex justify-center pb-8 pt-4 sm:gap-4 gap-2">
+                            <Button
+                                className="tracking-wide font-medium data-[hover=true]:-translate-y-1"
+                                radius="sm"
+                                variant="shadow"
+                                color="primary"
+                                type="button"
+                                startContent={<ArrowHookUpLeftFilled className="size-5"/>}
+                                onPress={() => {window.location.replace("/ForgotPassword")}}
+                            >
+                                Volver
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )
+        } else if (!tokenChecked || tokenValid) {
+            content = (
+                <Modal
+                    hideCloseButton
+                    size="md"
+                    radius="lg"
+                    isKeyboardDismissDisabled
+                    isDismissable={false}
+                    isOpen={isOpen}
+                    onOpenChange={setIsOpen}
+                    classNames={{wrapper: "overflow-hidden", backdrop: "bg-black/20"}}
+                    ref={targetRef} 
+                    className="my-0"
+                >
+                    <ModalContent className="bg-background">
+                        {wasUpdated ? (
+                            <>
+                                <ModalHeader {...moveProps} className="flex flex-col gap-2 pb-4 pt-8">
+                                    <p className="text-lg font-bold text-center">Contraseña actualizada</p>
+                                </ModalHeader>
+                                <ModalBody className="py-0 gap-0">
+                                    <p className="text-sm font-normal pb-4 text-center">Tu contraseña fue actualizada correctamente. Ya puedes iniciar sesión.</p>
+                                </ModalBody>
+                                <ModalFooter className="flex justify-center pb-8 pt-4 sm:gap-4 gap-2">
+                                    <Button
+                                        className="tracking-wide font-medium data-[hover=true]:-translate-y-1"
+                                        radius="sm"
+                                        variant="shadow"
+                                        color="primary"
+                                        type="button"
+                                        startContent={<ArrowHookUpLeftFilled className="size-5"/>}
+                                        onPress={() => {navigate("/")}}
+                                    >
+                                        Ir al inicio
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        ) : (
+                            <>
                                 <ModalHeader {...moveProps} className="flex flex-col gap-2 pb-4 pt-8">
                                     <p className="text-lg font-bold text-center">Actualizar contraseña</p>
                                 </ModalHeader>
@@ -143,143 +250,156 @@ export const ForgotPassword = () => {
                                         Actualizar
                                     </Button>
                                 </ModalFooter>
-                            </ModalContent>
-                        </Modal>  
-                    :   <Modal
-                            hideCloseButton
-                            size="md"
-                            radius="lg"
-                            isKeyboardDismissDisabled
-                            isDismissable={false}
-                            isOpen={isOpen}
-                            onOpenChange={setIsOpen}
-                            classNames={{wrapper: "overflow-hidden", backdrop: "bg-black/20"}}
-                            ref={targetRef} 
-                            className="my-0"
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+            )
+        } else {
+            content = (
+                <Modal
+                    hideCloseButton
+                    size="md"
+                    radius="lg"
+                    isKeyboardDismissDisabled
+                    isDismissable={false}
+                    isOpen={isOpen}
+                    onOpenChange={setIsOpen}
+                    classNames={{wrapper: "overflow-hidden", backdrop: "bg-black/20"}}
+                    ref={targetRef} 
+                    className="my-0"
+                >
+                    <ModalContent className="bg-background">
+                        <ModalHeader {...moveProps} className="flex flex-col gap-2 pb-4 pt-8">
+                            <p className="text-lg font-bold text-center">Token inválido</p>
+                        </ModalHeader>
+                        <ModalBody className="py-0 gap-0">
+                            <p className="text-sm font-normal pb-4 text-center">El enlace proporcionado es inválido o ya expiró, por favor, solicite uno nuevo.</p>
+                        </ModalBody>
+                        <ModalFooter className="flex justify-center pb-8 pt-4 sm:gap-4 gap-2">
+                            <Button
+                                className="tracking-wide font-medium data-[hover=true]:-translate-y-1"
+                                radius="sm"
+                                variant="shadow"
+                                color="primary"
+                                type="button"
+                                startContent={<ArrowHookUpLeftFilled className="size-5"/>}
+                                onPress={() => {window.location.replace("/ForgotPassword")}}
+                            >
+                                Volver
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )
+        }
+    } else {
+        content = wasSent ? (
+            <Modal
+                hideCloseButton
+                size="md"
+                radius="lg"
+                isKeyboardDismissDisabled
+                isDismissable={false}
+                isOpen={isOpen}
+                onOpenChange={setIsOpen}
+                classNames={{wrapper: "overflow-hidden", backdrop: "bg-black/20"}}
+                ref={targetRef} 
+                className="my-0"
+            >
+                <ModalContent className="bg-background">
+                    <ModalHeader {...moveProps} className="flex flex-col gap-2 pb-4 pt-8">
+                        <p className="text-lg font-bold text-center">Correo electrónico enviado</p>
+                    </ModalHeader>
+                    <ModalBody className="py-0 gap-0">
+                        <p className="text-sm font-normal pb-4 text-center">Revise la bandeja de entrada de su correo electrónico e ingrese al link proporcionado dentro del mensaje que le enviamos. Ya puede cerrar esta pestaña</p>
+                    </ModalBody>
+                    <ModalFooter className="flex justify-center pb-8 pt-4 sm:gap-4 gap-2">
+                        <Button
+                            className="tracking-wide font-medium data-[hover=true]:-translate-y-1"
+                            radius="sm"
+                            variant="shadow"
+                            type="button"
+                            color="primary"
+                            startContent={<ArrowHookUpLeftFilled className="size-5"/>}
+                            onPress={() => {window.location.reload(true)}}
                         >
-                            <ModalContent className="bg-background">
-                                <ModalHeader {...moveProps} className="flex flex-col gap-2 pb-4 pt-8">
-                                    <p className="text-lg font-bold text-center">Token inválido</p>
-                                </ModalHeader>
-                                <ModalBody className="py-0 gap-0">
-                                    <p className="text-sm font-normal pb-4 text-center">El token proporcionado no cuenta con un formato correcto, por favor, inténtelo de nuevo</p>
-                                </ModalBody>
-                                <ModalFooter className="flex justify-center pb-8 pt-4 sm:gap-4 gap-2">
-                                    <Button
-                                        className="tracking-wide font-medium data-[hover=true]:-translate-y-1"
-                                        radius="sm"
-                                        variant="shadow"
-                                        color="primary"
-                                        type="button"
-                                        startContent={<ArrowHookUpLeftFilled className="size-5"/>}
-                                        onPress={() => {window.location.replace("/ForgotPassword")}}
-                                    >
-                                        Volver
-                                    </Button>
-                                </ModalFooter>
-                            </ModalContent>
-                        </Modal>
-            ) : (
-                wasSent 
-                    ?   <Modal
-                            hideCloseButton
-                            size="md"
-                            radius="lg"
-                            isKeyboardDismissDisabled
-                            isDismissable={false}
-                            isOpen={isOpen}
-                            onOpenChange={setIsOpen}
-                            classNames={{wrapper: "overflow-hidden", backdrop: "bg-black/20"}}
-                            ref={targetRef} 
-                            className="my-0"
+                            Volver
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        ) : (
+            <Modal
+                hideCloseButton
+                size="md"
+                radius="lg"
+                isKeyboardDismissDisabled
+                isDismissable={false}
+                isOpen={isOpen}
+                onOpenChange={setIsOpen}
+                classNames={{wrapper: "overflow-hidden", backdrop: "bg-black/20"}}
+                ref={targetRef} 
+                className="my-0"
+            >
+                <ModalContent className="bg-background">
+                    <ModalHeader {...moveProps} className="flex flex-col gap-2 pb-4 pt-8">
+                        <p className="text-lg font-bold text-center">Restablecer contraseña</p>
+                    </ModalHeader>
+                    <ModalBody className="py-0 gap-0">
+                        <p className="text-sm font-normal pb-6 text-center">Ingrese su correo electrónico de acceso para enviarle un enlace seguro para cambiar su contraseña. El enlace caduca por seguridad.</p>
+                        <Form onSubmit={onSubmit} id="form" className="gap-6 flex flex-col">
+                            <Input
+                                label={
+                                    <div className="flex justify-between">
+                                        <div className="flex items-center gap-1">
+                                            <p className="font-medium text-sm">Correo electrónico</p>
+                                            <TextAsteriskFilled className="size-3 text-background-500 group-data-[focus=true]:text-primary group-data-[invalid=true]:!text-danger"/>
+                                        </div>
+                                    </div>
+                                }
+                                autoComplete="email"
+                                classNames={{ label: "w-full font-medium !text-current transition-colors !duration-1000 ease-in-out", input: "transition-colors !duration-1000 ease-in-out group-data-[invalid=true]:!text-current font-medium !placeholder-background-500 placeholder:!font-normal",  mainWrapper: "group-data-[invalid=true]:animate-shake", inputWrapper: "transition-colors !duration-1000 ease-in-out caret-primary group-data-[invalid=true]:caret-danger bg-background-100 group-data-[hover=true]:border-background-200 group-data-[focus=true]:!border-primary group-data-[invalid=true]:!border-danger border-transparent text-current" }}
+                                className="w-full"
+                                color="primary"
+                                name="email"
+                                labelPlacement="outside"
+                                type="email"
+                                radius="sm"
+                                size="md"
+                                variant="bordered"
+                                maxLength={50}
+                                placeholder="Ingrese su correo electrónico"
+                                value={email}
+                                onValueChange={handleEmailChange}
+                                isInvalid={!!emailError}
+                                errorMessage={emailError}
+                            />
+                        </Form>
+                    </ModalBody>
+                    <ModalFooter className="flex justify-center pb-8 pt-4 sm:gap-4 gap-2">
+                        <Button
+                            className="tracking-wide font-medium data-[hover=true]:-translate-y-1"
+                            form="form"
+                            radius="sm"
+                            variant="shadow"
+                            color="primary"
+                            type="submit"
+                            startContent={!isLoading && <ArrowHookUpRightFilled className="size-5"/>}
+                            isLoading={isLoading}
+                            isDisabled={!!emailError}
                         >
-                            <ModalContent className="bg-background">
-                                <ModalHeader {...moveProps} className="flex flex-col gap-2 pb-4 pt-8">
-                                    <p className="text-lg font-bold text-center">Correo electrónico enviado</p>
-                                </ModalHeader>
-                                <ModalBody className="py-0 gap-0">
-                                    <p className="text-sm font-normal pb-4 text-center">Revise la bandeja de entrada de su correo electrónico e ingrese al link proporcionado dentro del mensaje que le enviamos. Ya puede cerrar esta pestaña</p>
-                                </ModalBody>
-                                <ModalFooter className="flex justify-center pb-8 pt-4 sm:gap-4 gap-2">
-                                    <Button
-                                        className="tracking-wide font-medium data-[hover=true]:-translate-y-1"
-                                        radius="sm"
-                                        variant="shadow"
-                                        type="button"
-                                        color="primary"
-                                        startContent={<ArrowHookUpLeftFilled className="size-5"/>}
-                                        onPress={() => {window.location.reload(true)}}
-                                    >
-                                        Volver
-                                    </Button>
-                                </ModalFooter>
-                            </ModalContent>
-                        </Modal>
-                    :   <Modal
-                            hideCloseButton
-                            size="md"
-                            radius="lg"
-                            isKeyboardDismissDisabled
-                            isDismissable={false}
-                            isOpen={isOpen}
-                            onOpenChange={setIsOpen}
-                            classNames={{wrapper: "overflow-hidden", backdrop: "bg-black/20"}}
-                            ref={targetRef} 
-                            className="my-0"
-                        >
-                            <ModalContent className="bg-background">
-                                <ModalHeader {...moveProps} className="flex flex-col gap-2 pb-4 pt-8">
-                                    <p className="text-lg font-bold text-center">Restablecer contraseña</p>
-                                </ModalHeader>
-                                <ModalBody className="py-0 gap-0">
-                                    <p className="text-sm font-normal pb-6 text-center">Ingrese su correo electrónico de acceso para enviarle un enlace seguro para cambiar su contraseña. El enlace caduca por seguridad.</p>
-                                    <Form onSubmit={onSubmit} id="form" className="gap-6 flex flex-col">
-                                        <Input
-                                            label={
-                                                <div className="flex justify-between">
-                                                    <div className="flex items-center gap-1">
-                                                        <p className="font-medium text-sm">Correo electrónico</p>
-                                                        <TextAsteriskFilled className="size-3 text-background-500 group-data-[focus=true]:text-primary group-data-[invalid=true]:!text-danger"/>
-                                                    </div>
-                                                </div>
-                                            }
-                                            autoComplete="email"
-                                            classNames={{ label: "w-full font-medium !text-current transition-colors !duration-1000 ease-in-out", input: "transition-colors !duration-1000 ease-in-out group-data-[invalid=true]:!text-current font-medium !placeholder-background-500 placeholder:!font-normal",  mainWrapper: "group-data-[invalid=true]:animate-shake", inputWrapper: "transition-colors !duration-1000 ease-in-out caret-primary group-data-[invalid=true]:caret-danger bg-background-100 group-data-[hover=true]:border-background-200 group-data-[focus=true]:!border-primary group-data-[invalid=true]:!border-danger border-transparent text-current" }}
-                                            className="w-full"
-                                            color="primary"
-                                            name="email"
-                                            labelPlacement="outside"
-                                            type="email"
-                                            radius="sm"
-                                            size="md"
-                                            variant="bordered"
-                                            maxLength={50}
-                                            placeholder="Ingrese su correo electrónico"
-                                            value={email}
-                                            onValueChange={handleEmailChange}
-                                            isInvalid={!!emailError}
-                                            errorMessage={emailError}
-                                        />
-                                    </Form>
-                                </ModalBody>
-                                <ModalFooter className="flex justify-center pb-8 pt-4 sm:gap-4 gap-2">
-                                    <Button
-                                        className="tracking-wide font-medium data-[hover=true]:-translate-y-1"
-                                        form="form"
-                                        radius="sm"
-                                        variant="shadow"
-                                        color="primary"
-                                        type="submit"
-                                        startContent={!isLoading && <ArrowHookUpRightFilled className="size-5"/>}
-                                        isLoading={isLoading}
-                                        isDisabled={!!emailError}
-                                    >
-                                        Siguiente
-                                    </Button>
-                                </ModalFooter>
-                            </ModalContent>
-                        </Modal>  
-            )}
+                            Siguiente
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        )
+    }
+
+    return (
+        <>
+            {content}
         </>
     )
 }
