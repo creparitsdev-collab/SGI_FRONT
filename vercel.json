@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://sgi-back-35cv.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
