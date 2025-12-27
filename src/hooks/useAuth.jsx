@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { useIsIconOnlySmall } from './useIsIconOnly';
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://sgi-backend-ok03.onrender.com/api').replace(/\/+$/, '')
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://sgi-back-35cv.onrender.com/api').replace(/\/+$/, '')
 
 const AuthContext = createContext();
 

@@ -2,7 +2,7 @@ import axios from "axios";
 
 const baseURL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://sgi-backend-ok03.onrender.com/api";
+  "https://sgi-back-35cv.onrender.com/api";
 
 const api = axios.create({
   withCredentials: true,

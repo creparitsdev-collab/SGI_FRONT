@@ -6,7 +6,7 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.jsx";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://sgi-backend-ok03.onrender.com/api').replace(/\/+$/, '')
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://sgi-back-35cv.onrender.com/api').replace(/\/+$/, '')
 
 export const Login = () => {
     const { login, user } = useAuth();

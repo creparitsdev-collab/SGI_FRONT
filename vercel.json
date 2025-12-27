@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://sgi-backend-ok03.onrender.com/api/:path*"
+      "destination": "https://sgi-back-35cv.onrender.com/api/:path*"
     }
   ],
   "headers": [
