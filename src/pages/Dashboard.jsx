@@ -135,10 +135,6 @@ export const Dashboard = () => {
             icon: <CheckmarkCircleFilled className="size-8" />,
             color: "bg-warning-50 text-warning-600",
           },
-        ]
-      : []),
-    ...(user.role === "ADMIN"
-      ? [
           {
             title: "Usuarios",
             value: stats.totalUsers,
@@ -146,7 +142,20 @@ export const Dashboard = () => {
             color: "bg-secondary-50 text-secondary-600",
           },
         ]
-      : []),
+      : [
+          {
+            title: "Stock Bajo",
+            value: stats.lowStockProducts.length,
+            icon: <AlertFilled className="size-8" />,
+            color: "bg-warning-50 text-warning-600",
+          },
+          {
+            title: "Recientes",
+            value: stats.recentProducts.length,
+            icon: <BoxMultipleFilled className="size-8" />,
+            color: "bg-secondary-50 text-secondary-600",
+          },
+        ]),
   ];
 
   const userDisplayName =
@@ -176,6 +185,10 @@ export const Dashboard = () => {
                   return "/App/ProductStatuses";
                 case "Usuarios":
                   return "/App/Users";
+                case "Stock Bajo":
+                  return "/App/Products";
+                case "Recientes":
+                  return "/App/Products";
                 default:
                   return "/App";
               }
