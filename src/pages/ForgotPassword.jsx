@@ -1,5 +1,5 @@
 import { ArrowHookUpLeftFilled, ArrowHookUpRightFilled, CheckmarkFilled, DismissFilled, EditFilled, EyeFilled, EyeOffFilled, TextAsteriskFilled } from "@fluentui/react-icons"
-import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDraggable } from "@heroui/react"
+import { addToast, Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDraggable } from "@heroui/react"
 import { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router"
 import { isValidUUID } from "../js/validators"
@@ -80,6 +80,20 @@ export const ForgotPassword = () => {
         try {
             await forgotPassword({ email: (data.email || "").trim() })
             setWasSent(true)
+            addToast({
+                title: "Correo electrónico enviado",
+                description: "Revisa tu bandeja de entrada para continuar con el restablecimiento.",
+                color: "primary",
+                icon: <CheckmarkFilled className='size-5' />
+            })
+        } catch (error) {
+            const message = error?.response?.data?.message || "No fue posible enviar el correo. Verifica el email e inténtalo de nuevo."
+            addToast({
+                title: "No se pudo enviar el correo",
+                description: message,
+                color: "danger",
+                icon: <DismissFilled className='size-5' />
+            })
         } finally {
             setIsLoading(false)
         }
@@ -102,6 +116,20 @@ export const ForgotPassword = () => {
         try {
             await resetPassword({ token: currentToken, newPassword })
             setWasUpdated(true)
+            addToast({
+                title: "Contraseña actualizada",
+                description: "Ya puedes iniciar sesión con tu nueva contraseña.",
+                color: "primary",
+                icon: <CheckmarkFilled className='size-5' />
+            })
+        } catch (error) {
+            const message = error?.response?.data?.message || "No fue posible actualizar la contraseña. El enlace puede haber expirado."
+            addToast({
+                title: "No se pudo actualizar la contraseña",
+                description: message,
+                color: "danger",
+                icon: <DismissFilled className='size-5' />
+            })
         } finally {
             setIsLoading(false)
         }
