@@ -297,7 +297,7 @@ export const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.5 }}
-            className="w-full"
+            className={user.role === "ADMIN" ? "w-full" : "w-full lg:col-span-2"}
           >
             <Card shadow="sm" radius="lg" className="w-full flex flex-col">
               <CardBody className="p-6 flex-1">
