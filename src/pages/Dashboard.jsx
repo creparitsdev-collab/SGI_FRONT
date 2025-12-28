@@ -36,12 +36,14 @@ export const Dashboard = () => {
       try {
         setIsLoading(true);
 
+        const isAdmin = user.role === "ADMIN";
+
         const [productsRes, cataloguesRes, statusesRes, usersRes] =
           await Promise.all([
             getProducts(),
             getStockCatalogues(),
-            getProductStatuses(),
-            user.role === "ADMIN" ? getUsers() : Promise.resolve({ data: [] }),
+            isAdmin ? getProductStatuses() : Promise.resolve({ data: [] }),
+            isAdmin ? getUsers() : Promise.resolve({ data: [] }),
           ]);
 
         const products = productsRes?.data?.content || [];
@@ -125,12 +127,16 @@ export const Dashboard = () => {
       icon: <BoxFilled className="size-8" />,
       color: "bg-success-50 text-success-600",
     },
-    {
-      title: "Estados",
-      value: stats.totalStatuses,
-      icon: <CheckmarkCircleFilled className="size-8" />,
-      color: "bg-warning-50 text-warning-600",
-    },
+    ...(user.role === "ADMIN"
+      ? [
+          {
+            title: "Estados",
+            value: stats.totalStatuses,
+            icon: <CheckmarkCircleFilled className="size-8" />,
+            color: "bg-warning-50 text-warning-600",
+          },
+        ]
+      : []),
     ...(user.role === "ADMIN"
       ? [
           {
@@ -211,65 +217,67 @@ export const Dashboard = () => {
         {/* Content Grid - 2 columnas iguales con altura fija */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
           {/* Productos por Estado */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
-            className="w-full"
-          >
-            <Card shadow="sm" radius="lg" className="w-full flex flex-col">
-              <CardBody className="p-6 flex-1">
-                <div className="flex flex-col gap-4 h-full">
-                  <div className="flex items-center justify-between flex-shrink-0">
-                    <p className="text-lg font-bold">Productos por Estado</p>
-                    <CheckmarkCircleFilled className="size-5 text-background-500" />
-                  </div>
+          {user.role === "ADMIN" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
+              className="w-full"
+            >
+              <Card shadow="sm" radius="lg" className="w-full flex flex-col">
+                <CardBody className="p-6 flex-1">
+                  <div className="flex flex-col gap-4 h-full">
+                    <div className="flex items-center justify-between flex-shrink-0">
+                      <p className="text-lg font-bold">Productos por Estado</p>
+                      <CheckmarkCircleFilled className="size-5 text-background-500" />
+                    </div>
 
-                  <div className="flex flex-col gap-3 flex-1 min-h-0">
-                    {stats.productsByStatus.map((status, index) => (
-                      <motion.div
-                        key={status.name}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
-                        className="w-full"
-                      >
-                        <Card
-                          shadow="none"
-                          radius="lg"
-                          isPressable
-                          onPress={() => navigate("/App/ProductStatuses")}
-                          className="w-full bg-background-100 dark:bg-background-200 transition-colors duration-300 cursor-pointer"
+                    <div className="flex flex-col gap-3 flex-1 min-h-0">
+                      {stats.productsByStatus.map((status, index) => (
+                        <motion.div
+                          key={status.name}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+                          className="w-full"
                         >
-                          <CardBody className="p-4">
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex items-center gap-3 flex-1 min-w-0">
-                                {/*<div className={`w-2 h-2 rounded-full flex-shrink-0 ${status.color.replace('text-', 'bg-')}`} />
-                                 */}
-                                <p className="text-sm font-medium truncate">
-                                  {status.name}
-                                </p>
+                          <Card
+                            shadow="none"
+                            radius="lg"
+                            isPressable
+                            onPress={() => navigate("/App/ProductStatuses")}
+                            className="w-full bg-background-100 dark:bg-background-200 transition-colors duration-300 cursor-pointer"
+                          >
+                            <CardBody className="p-4">
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  {/*<div className={`w-2 h-2 rounded-full flex-shrink-0 ${status.color.replace('text-', 'bg-')}`} />
+                                   */}
+                                  <p className="text-sm font-medium truncate">
+                                    {status.name}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <p
+                                    className={`text-lg font-bold ${status.color}`}
+                                  >
+                                    {status.count}
+                                  </p>
+                                  <p className="text-xs text-background-500">
+                                    productos
+                                  </p>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <p
-                                  className={`text-lg font-bold ${status.color}`}
-                                >
-                                  {status.count}
-                                </p>
-                                <p className="text-xs text-background-500">
-                                  productos
-                                </p>
-                              </div>
-                            </div>
-                          </CardBody>
-                        </Card>
-                      </motion.div>
-                    ))}
+                            </CardBody>
+                          </Card>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </CardBody>
-            </Card>
-          </motion.div>
+                </CardBody>
+              </Card>
+            </motion.div>
+          )}
 
           {/* Stock Bajo */}
           <motion.div

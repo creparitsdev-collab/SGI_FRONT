@@ -547,16 +547,11 @@ export const AppLayout = () => {
       icon: <GridFilled className="sm:size-5 size-6" />,
       path: "/App",
     },
-    ...(profile.roleName === "ADMIN"
-      ? [
-          {
-            label: "Catálogos",
-            icon: <BoxMultipleFilled className="sm:size-5 size-6" />,
-            path: "/App/StockCatalogues",
-          },
-        ]
-      : []),
-
+    {
+      label: "Catálogos",
+      icon: <BoxMultipleFilled className="sm:size-5 size-6" />,
+      path: "/App/StockCatalogues",
+    },
     {
       label: "Productos",
       icon: <BoxFilled className="sm:size-5 size-6" />,
@@ -616,39 +611,7 @@ export const AppLayout = () => {
 
   const operadorNavigation = [...navigation];
 
-  const supervisorNavigation = [
-    ...navigation,
-    {
-      label: "Catálogos",
-      icon: <BoxMultipleFilled className="sm:size-5 size-6" />,
-      path: "/App/StockCatalogues",
-    },
-    {
-      label: "Unidades de medida",
-      icon: <TagFilled className="sm:size-5 size-6" />,
-      path: "/App/UnitsOfMeasurement",
-    },
-    {
-      label: "Tipos de almacén",
-      icon: <DockFilled className="sm:size-5 size-6" />,
-      path: "/App/WarehouseTypes",
-    },
-    {
-      label: "Estados",
-      icon: <CheckmarkCircleFilled className="sm:size-5 size-6" />,
-      path: "/App/ProductStatuses",
-    },
-    {
-      label: "Usuarios",
-      icon: <PeopleFilled className="sm:size-5 size-6" />,
-      path: "/App/Users",
-    },
-    /* {
-            label: "Proveedores de servicio",
-            icon: <PersonWrenchFilled className='size-5' />,
-            path: "/App/ServiceProviders"
-        } */
-  ];
+  const supervisorNavigation = [...navigation];
 
   let roleSidebarNavigation;
 
@@ -891,7 +854,7 @@ export const AppLayout = () => {
 
                 {/* BOTTOM NAVIGATION */}
                 <div className="flex-shrink-0 flex justify-center h-16 bg-background sm:hidden rounded-lg z-50 gap-14 dark:shadow-large shadow-medium transition-colors duration-1000 ease-in-out">
-                  {navigation.map(({ label, icon, path }) => (
+                  {roleSidebarNavigation.map(({ label, icon, path }) => (
                     <BottomButton
                       isActive={getIsActive(path)}
                       key={label}

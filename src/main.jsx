@@ -273,7 +273,7 @@ createRoot(document.getElementById('root')).render(
 									<Route
 										path='Equipments'
 										element={
-											<ProtectedRoute allowedRoles={[]}>
+											<ProtectedRoute allowedRoles={['ADMIN']}>
 												<Equipments />
 											</ProtectedRoute>
 										}
@@ -289,7 +289,7 @@ createRoot(document.getElementById('root')).render(
 									<Route
 										path='StockCatalogues'
 										element={
-											<ProtectedRoute allowedRoles={['ADMIN', 'SUPERVISOR']}>
+											<ProtectedRoute allowedRoles={[]}>
 												<StockCatalogues />
 											</ProtectedRoute>
 										}
@@ -297,7 +297,7 @@ createRoot(document.getElementById('root')).render(
 									<Route
 										path='UnitsOfMeasurement'
 										element={
-											<ProtectedRoute allowedRoles={['ADMIN', 'SUPERVISOR']}>
+											<ProtectedRoute allowedRoles={['ADMIN']}>
 												<UnitsOfMeasurement />
 											</ProtectedRoute>
 										}
@@ -305,7 +305,7 @@ createRoot(document.getElementById('root')).render(
 									<Route
 										path='WarehouseTypes'
 										element={
-											<ProtectedRoute allowedRoles={['ADMIN', 'SUPERVISOR']}>
+											<ProtectedRoute allowedRoles={['ADMIN']}>
 												<WarehouseTypes />
 											</ProtectedRoute>
 										}
@@ -313,7 +313,7 @@ createRoot(document.getElementById('root')).render(
 									<Route
 										path='ProductStatuses'
 										element={
-											<ProtectedRoute allowedRoles={['ADMIN', 'SUPERVISOR']}>
+											<ProtectedRoute allowedRoles={['ADMIN']}>
 												<ProductStatuses />
 											</ProtectedRoute>
 										}
@@ -321,7 +321,7 @@ createRoot(document.getElementById('root')).render(
 									<Route
 										path='Users'
 										element={
-											<ProtectedRoute allowedRoles={['ADMIN', 'SUPERVISOR']}>
+											<ProtectedRoute allowedRoles={['ADMIN']}>
 												<Users />
 											</ProtectedRoute>
 										}
@@ -345,7 +345,7 @@ createRoot(document.getElementById('root')).render(
 									<Route
 										path='Services'
 										element={
-											<ProtectedRoute allowedRoles={[]}>
+											<ProtectedRoute allowedRoles={['ADMIN']}>
 												<MaintenanceCalibration />
 											</ProtectedRoute>
 										}
@@ -353,7 +353,7 @@ createRoot(document.getElementById('root')).render(
 									<Route
 										path='ServiceProviders'
 										element={
-											<ProtectedRoute allowedRoles={['ADMIN', 'SUPERVISOR']}>
+											<ProtectedRoute allowedRoles={['ADMIN']}>
 												<MaintenanceProviders />
 											</ProtectedRoute>
 										}

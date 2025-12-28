@@ -86,6 +86,8 @@ export const ProductsDrawer = ({
       data?.numeroContenedores != null ? String(data.numeroContenedores) : "",
   });
 
+  const isEditable = action === "create" || action === "update";
+
   const [productErrors, setProductErrors] = useState({
     stockCatalogueId: [],
     productStatusId: [],
@@ -126,10 +128,35 @@ export const ProductsDrawer = ({
       }
     };
 
-    if (isOpen) {
+    if (!isOpen) return;
+
+    if (action === "create" || action === "update") {
       fetchData();
+      return;
     }
-  }, [isOpen]);
+
+    const fallbackCatalogue =
+      product.stockCatalogueId && (product.stockCatalogueName || data?.stockCatalogueName)
+        ? [{ id: product.stockCatalogueId, name: product.stockCatalogueName || data?.stockCatalogueName }]
+        : [];
+    const fallbackStatus =
+      product.productStatusId && (product.productStatusName || data?.productStatusName)
+        ? [{ id: product.productStatusId, name: product.productStatusName || data?.productStatusName }]
+        : [];
+    const fallbackUnit =
+      product.unitOfMeasurementId && (product.unitOfMeasurementName || data?.unitOfMeasurementName)
+        ? [{ id: product.unitOfMeasurementId, name: product.unitOfMeasurementName || data?.unitOfMeasurementName }]
+        : [];
+    const fallbackWarehouseType =
+      product.warehouseTypeId && (product.warehouseTypeName || data?.warehouseTypeName)
+        ? [{ id: product.warehouseTypeId, name: product.warehouseTypeName || data?.warehouseTypeName }]
+        : [];
+
+    setCatalogues(fallbackCatalogue);
+    setStatuses(fallbackStatus);
+    setUnits(fallbackUnit);
+    setWarehouseTypes(fallbackWarehouseType);
+  }, [isOpen, action]);
 
   useEffect(() => {
     setProduct({
