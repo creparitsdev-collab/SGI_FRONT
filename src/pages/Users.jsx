@@ -91,7 +91,7 @@ export const Users = () => {
 
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]))
 
-    const [statusFilter, setStatusFilter] = React.useState(new Set(["activo"]))
+    const [statusFilter, setStatusFilter] = React.useState(new Set(["activo", "inactivo"]))
 
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
 

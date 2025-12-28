@@ -12,7 +12,7 @@ export const UsersChangeStatusModal = ({isOpen, onOpenChange, data, onRefresh}) 
         try {
             setIsLoading(true)
 
-            const response = await changeStatus(data.email)
+            const response = await changeStatus(data.id)
 
             if (response.type === "SUCCESS"){
                 addToast({

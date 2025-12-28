@@ -90,9 +90,9 @@ export const updateProfile = async (user) => {
 	}
 }
 
-export const changeStatus = async (email) => {
+export const changeStatus = async (id) => {
 	try {
-		const response = await api.delete(`/users/${email}`)
+		const response = await api.patch(`/users/toggle-status/${id}`)
 
 		if (response.status >= 200 && response.status < 300) {
 			return response.data
