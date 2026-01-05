@@ -149,20 +149,47 @@ export const Products = () => {
     let filteredProducts = [...products];
 
     if (hasSearchFilter) {
-      filteredProducts = filteredProducts.filter(
-        (product) =>
-          product.nombre?.toLowerCase().includes(searchValue.toLowerCase()) ||
-          product.stockCatalogueName
-            ?.toLowerCase()
-            .includes(searchValue.toLowerCase()) ||
-          product.lote?.toLowerCase().includes(searchValue.toLowerCase()) ||
-          product.fabricante
-            ?.toLowerCase()
-            .includes(searchValue.toLowerCase()) ||
-          product.distribuidor
-            ?.toLowerCase()
-            .includes(searchValue.toLowerCase())
+      const normalizedSearch = String(searchValue).trim().toLowerCase();
+
+      const statusNames = Array.from(
+        new Set(
+          products
+            .map((p) => String(p.productStatusName || "").trim().toLowerCase())
+            .filter(Boolean)
+        )
+      ).sort((a, b) => b.length - a.length);
+
+      const matchedStatus = statusNames.find(
+        (statusName) =>
+          normalizedSearch === statusName || normalizedSearch.includes(statusName)
       );
+
+      let remainingText = normalizedSearch;
+      if (matchedStatus) {
+        remainingText = remainingText
+          .replace(matchedStatus, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        filteredProducts = filteredProducts.filter((product) =>
+          String(product.productStatusName || "")
+            .toLowerCase()
+            .includes(matchedStatus)
+        );
+      }
+
+      if (remainingText) {
+        filteredProducts = filteredProducts.filter(
+          (product) =>
+            product.nombre?.toLowerCase().includes(remainingText) ||
+            product.stockCatalogueName?.toLowerCase().includes(remainingText) ||
+            (!matchedStatus &&
+              product.productStatusName?.toLowerCase().includes(remainingText)) ||
+            product.lote?.toLowerCase().includes(remainingText) ||
+            product.fabricante?.toLowerCase().includes(remainingText) ||
+            product.distribuidor?.toLowerCase().includes(remainingText)
+        );
+      }
     }
 
     return filteredProducts;
@@ -544,6 +571,10 @@ export const Products = () => {
                       Código Prod.
                     </div>
 
+                    <div className="flex-1 min-w-0 max-w-[10%] text-center">
+                      Cantidad total
+                    </div>
+
                     <div className="flex-1 min-w-0 max-w-[12%]">
                       N° Contenedores
                     </div>
@@ -659,6 +690,14 @@ export const Products = () => {
                                   Código Prod.:{" "}
                                 </span>
                                 {item.codigoProducto}
+                              </p>
+                            )}
+                            {item.cantidadTotal != null && (
+                              <p className="text-xs text-background-500 max-w-full break-all line-clamp-1">
+                                <span className="text-background-700 font-medium">
+                                  Cantidad total:{" "}
+                                </span>
+                                {item.cantidadTotal}
                               </p>
                             )}
                             {item.fabricante && (
@@ -858,6 +897,12 @@ export const Products = () => {
                           <div className="flex-1 min-w-0 max-w-[10%]">
                             <p className="text-sm truncate">
                               {item.codigoProducto || "-"}
+                            </p>
+                          </div>
+
+                          <div className="flex-1 min-w-0 max-w-[10%]">
+                            <p className="text-sm truncate text-center">
+                              {item.cantidadTotal ?? "-"}
                             </p>
                           </div>
 

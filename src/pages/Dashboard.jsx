@@ -8,7 +8,7 @@ import {
 } from "@fluentui/react-icons";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import {
   getProducts,
   getStockCatalogues,
@@ -20,6 +20,7 @@ import { useAuth } from "../hooks/useAuth";
 export const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { setSearchValue } = useOutletContext();
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     totalProducts: 0,
@@ -258,7 +259,10 @@ export const Dashboard = () => {
                             shadow="none"
                             radius="lg"
                             isPressable
-                            onPress={() => navigate("/App/ProductStatuses")}
+                            onPress={() => {
+                              setSearchValue(status.name);
+                              navigate(`/App/Products?statusId=${status.id}`);
+                            }}
                             className="w-full bg-background-100 dark:bg-background-200 transition-colors duration-300 cursor-pointer"
                           >
                             <CardBody className="p-4">
