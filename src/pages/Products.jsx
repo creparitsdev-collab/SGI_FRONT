@@ -9,6 +9,12 @@ import {
   DropdownMenu,
   DropdownSection,
   DropdownTrigger,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Pagination,
   Popover,
   PopoverContent,
@@ -22,7 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/react";
-import { getProducts } from "../service/product";
+import { getProducts, updateProduct } from "../service/product";
 import { PrimaryButton } from "../components/PrimaryButton";
 import React, { useEffect, useState, useTransition } from "react";
 import { useIsIconOnlyMedium } from "../hooks/useIsIconOnly";
@@ -68,6 +74,10 @@ export const Products = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+  const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState("");
+  const [discountDescription, setDiscountDescription] = useState("");
+  const [isDiscountLoading, setIsDiscountLoading] = useState(false);
 
   const [selectedProduct, setSelectedProduct] = useState({});
   const [action, setAction] = useState("");
@@ -293,6 +303,145 @@ export const Products = () => {
   const handleViewQR = (product) => {
     setSelectedProduct(product);
     setIsQRModalOpen(true);
+  };
+
+  const handleOpenDiscountModal = (product) => {
+    setSelectedProduct(product);
+    setDiscountAmount("");
+    setDiscountDescription("");
+    setIsDiscountModalOpen(true);
+  };
+
+  const handleApplyDiscount = async () => {
+    const currentQty = Number(selectedProduct?.cantidadTotal);
+    const discountQty = Number(discountAmount);
+    const performedAt = new Date().toLocaleString();
+    const performedBy =
+      user?.name || user?.username || user?.email || user?.fullName || "";
+
+    if (!Number.isFinite(currentQty)) {
+      addToast({
+        title: "No se puede aplicar el descuento",
+        description: "La cantidad total actual no es válida.",
+        color: "danger",
+        icon: <DismissCircleFilled className="size-5" />,
+      });
+      return;
+    }
+
+    if (!Number.isFinite(discountQty) || discountQty <= 0) {
+      addToast({
+        title: "Atención",
+        description: "Ingrese una cantidad de descuento válida.",
+        color: "warning",
+        icon: <DismissCircleFilled className="size-5" />,
+      });
+      return;
+    }
+
+    if (discountQty > currentQty) {
+      addToast({
+        title: "Atención",
+        description: "El descuento no puede ser mayor que la cantidad total.",
+        color: "warning",
+        icon: <DismissCircleFilled className="size-5" />,
+      });
+      return;
+    }
+
+    const stockCatalogueId = parseInt(selectedProduct?.stockCatalogueId);
+    const productStatusId = parseInt(selectedProduct?.productStatusId);
+    const unitOfMeasurementId = parseInt(selectedProduct?.unitOfMeasurementId);
+    const warehouseTypeId = parseInt(selectedProduct?.warehouseTypeId);
+    const numeroContenedores = parseInt(selectedProduct?.numeroContenedores);
+    const fechaIngreso = selectedProduct?.fechaIngreso ?? selectedProduct?.fecha;
+
+    const hasRequiredFields =
+      selectedProduct?.id != null &&
+      Number.isFinite(stockCatalogueId) &&
+      Number.isFinite(productStatusId) &&
+      Number.isFinite(unitOfMeasurementId) &&
+      Number.isFinite(warehouseTypeId) &&
+      Number.isFinite(numeroContenedores) &&
+      String(selectedProduct?.nombre || "").trim() &&
+      String(selectedProduct?.lote || "").trim() &&
+      String(selectedProduct?.loteProveedor || "").trim() &&
+      String(selectedProduct?.codigoProducto || "").trim() &&
+      String(selectedProduct?.numeroAnalisis || "").trim() &&
+      Boolean(fechaIngreso);
+
+    if (!hasRequiredFields) {
+      addToast({
+        title: "No se puede aplicar el descuento",
+        description:
+          "Este producto no tiene todos los datos requeridos para actualizarse desde esta acción. Use 'Actualizar producto'.",
+        color: "warning",
+        icon: <DismissCircleFilled className="size-5" />,
+      });
+      return;
+    }
+
+    const nextQty = currentQty - discountQty;
+
+    try {
+      setIsDiscountLoading(true);
+
+      const productData = {
+        id: selectedProduct.id,
+        stockCatalogueId,
+        productStatusId,
+        unitOfMeasurementId,
+        warehouseTypeId,
+        nombre: selectedProduct.nombre?.trim(),
+        lote: selectedProduct.lote?.trim(),
+        loteProveedor: selectedProduct.loteProveedor?.trim(),
+        fabricante: selectedProduct.fabricante?.trim() || null,
+        distribuidor: selectedProduct.distribuidor?.trim() || null,
+        codigoProducto: selectedProduct.codigoProducto?.trim(),
+        numeroAnalisis: selectedProduct.numeroAnalisis?.trim(),
+        fechaIngreso,
+        fechaCaducidad:
+          selectedProduct.fechaCaducidad ?? selectedProduct.caducidad,
+        reanalisis: selectedProduct.reanalisis,
+        fechaMuestreo: selectedProduct.fechaMuestreo ?? selectedProduct.muestreo,
+        cantidadTotal: parseInt(nextQty),
+        numeroContenedores,
+      };
+
+      const response = await updateProduct(productData);
+      const success = response?.type === "SUCCESS";
+
+      addToast({
+        title: success
+          ? "Se aplicó el descuento"
+          : "No se pudo aplicar el descuento",
+        description: success
+          ? `Cantidad actualizada a ${nextQty}.${performedBy ? ` Realizado por: ${performedBy}.` : ""} Fecha: ${performedAt}.${discountDescription?.trim() ? ` Descripción: ${discountDescription.trim()}.` : ""}`
+          : "Ocurrió un error al procesar la solicitud.",
+        color: success ? "primary" : "danger",
+        icon: success ? (
+          <CircleFilled className="size-5" />
+        ) : (
+          <DismissCircleFilled className="size-5" />
+        ),
+      });
+
+      if (success) {
+        setIsDiscountModalOpen(false);
+        triggerRefresh();
+      }
+    } catch (error) {
+      addToast({
+        title: "No se pudo aplicar el descuento",
+        description:
+          error.response?.data?.message ||
+          "Ocurrió un error al procesar la solicitud.",
+        color: "danger",
+        icon: <DismissCircleFilled className="size-5" />,
+      });
+    } finally {
+      setIsDiscountLoading(false);
+    }
   };
 
   const topContent = React.useMemo(() => {
@@ -823,6 +972,20 @@ export const Products = () => {
                                     </DropdownItem>
                                   )}
 
+                                  {user.role === "ADMIN" &&
+                                    item.cantidadTotal != null && (
+                                      <DropdownItem
+                                        className="rounded-md transition-all !duration-1000 ease-in-out w-40"
+                                        key="handleDiscountProduct"
+                                        startContent={
+                                          <EditFilled className="size-5" />
+                                        }
+                                        onPress={() => handleOpenDiscountModal(item)}
+                                      >
+                                        Generar descuento
+                                      </DropdownItem>
+                                    )}
+
                                   {user.role === "ADMIN" && (
                                     <DropdownItem
                                       className="rounded-md transition-all !duration-1000 ease-in-out w-40"
@@ -1013,6 +1176,20 @@ export const Products = () => {
                                     </DropdownItem>
                                   )}
 
+                                  {user.role === "ADMIN" &&
+                                    item.cantidadTotal != null && (
+                                      <DropdownItem
+                                        className="rounded-md transition-all !duration-1000 ease-in-out w-40"
+                                        key="handleDiscountProduct"
+                                        startContent={
+                                          <EditFilled className="size-5" />
+                                        }
+                                        onPress={() => handleOpenDiscountModal(item)}
+                                      >
+                                        Generar descuento
+                                      </DropdownItem>
+                                    )}
+
                                   {user.role === "ADMIN" && (
                                     <DropdownItem
                                       className="rounded-md transition-all !duration-1000 ease-in-out w-40"
@@ -1082,6 +1259,127 @@ export const Products = () => {
         onOpenChange={setIsQRModalOpen}
         product={selectedProduct}
       />
+
+      <Modal
+        hideCloseButton
+        size="md"
+        radius="lg"
+        isOpen={isDiscountModalOpen}
+        onOpenChange={setIsDiscountModalOpen}
+        classNames={{ backdrop: "bg-black/20" }}
+      >
+        <ModalContent className="bg-background">
+          {(onClose) => {
+            const currentQty = Number(selectedProduct?.cantidadTotal);
+            const discountQty = Number(discountAmount);
+            const nextQty =
+              Number.isFinite(currentQty) && Number.isFinite(discountQty)
+                ? currentQty - discountQty
+                : null;
+            const performedAt = new Date().toLocaleString();
+            const performedBy =
+              user?.name || user?.username || user?.email || user?.fullName || "-";
+
+            return (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  <p className="text-lg font-bold">Generar descuento</p>
+                  <p className="text-sm font-normal text-background-500">
+                    Descuenta una cantidad de la cantidad total actual.
+                  </p>
+                </ModalHeader>
+
+                <ModalBody className="gap-4">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm">
+                      <span className="font-medium">Producto:</span>{" "}
+                      {selectedProduct?.nombre || "-"}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-medium">Lote:</span>{" "}
+                      {selectedProduct?.lote || "-"}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-medium">Fecha:</span> {performedAt}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-medium">Realizado por:</span>{" "}
+                      {performedBy}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-medium">Cantidad actual:</span>{" "}
+                      {selectedProduct?.cantidadTotal ?? "-"}
+                    </p>
+                  </div>
+
+                  <Input
+                    label="Cantidad a descontar"
+                    labelPlacement="outside"
+                    type="number"
+                    radius="sm"
+                    variant="bordered"
+                    min={1}
+                    value={discountAmount}
+                    onValueChange={setDiscountAmount}
+                    placeholder="Ej: 100"
+                    classNames={{
+                      inputWrapper:
+                        "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 border-transparent text-current",
+                    }}
+                  />
+
+                  <Input
+                    label="Descripción (informativa)"
+                    labelPlacement="outside"
+                    type="text"
+                    radius="sm"
+                    variant="bordered"
+                    value={discountDescription}
+                    onValueChange={setDiscountDescription}
+                    placeholder="Ej: Muestra para laboratorio"
+                    classNames={{
+                      inputWrapper:
+                        "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 border-transparent text-current",
+                    }}
+                  />
+
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm text-background-500">
+                      Cantidad resultante:{" "}
+                      <span className="font-medium text-current">
+                        {nextQty == null || !Number.isFinite(nextQty)
+                          ? "-"
+                          : nextQty}
+                      </span>
+                    </p>
+                  </div>
+                </ModalBody>
+
+                <ModalFooter className="flex justify-end gap-2">
+                  <Button
+                    className="bg-transparent dark:bg-background-100"
+                    radius="sm"
+                    onPress={onClose}
+                    isDisabled={isDiscountLoading}
+                  >
+                    Cancelar
+                  </Button>
+
+                  <Button
+                    radius="sm"
+                    color="primary"
+                    variant="shadow"
+                    onPress={handleApplyDiscount}
+                    isLoading={isDiscountLoading}
+                  >
+                    Aplicar descuento
+                  </Button>
+                </ModalFooter>
+              </>
+            );
+          }}
+        </ModalContent>
+      </Modal>
     </>
   );
 };
