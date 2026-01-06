@@ -28,7 +28,11 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/react";
-import { getProducts, updateProduct } from "../service/product";
+import {
+  createProductDiscount,
+  getProductDiscounts,
+  getProducts,
+} from "../service/product";
 import { PrimaryButton } from "../components/PrimaryButton";
 import React, { useEffect, useState, useTransition } from "react";
 import { useIsIconOnlyMedium } from "../hooks/useIsIconOnly";
@@ -78,6 +82,8 @@ export const Products = () => {
   const [discountAmount, setDiscountAmount] = useState("");
   const [discountDescription, setDiscountDescription] = useState("");
   const [isDiscountLoading, setIsDiscountLoading] = useState(false);
+  const [discountLogs, setDiscountLogs] = useState([]);
+  const [isDiscountLogsLoading, setIsDiscountLogsLoading] = useState(false);
 
   const [selectedProduct, setSelectedProduct] = useState({});
   const [action, setAction] = useState("");
@@ -309,7 +315,23 @@ export const Products = () => {
     setSelectedProduct(product);
     setDiscountAmount("");
     setDiscountDescription("");
+    setDiscountLogs([]);
     setIsDiscountModalOpen(true);
+
+    if (!product?.id) return;
+
+    (async () => {
+      try {
+        setIsDiscountLogsLoading(true);
+        const response = await getProductDiscounts(product.id);
+        const data = Array.isArray(response?.data) ? response.data : [];
+        setDiscountLogs(data);
+      } catch {
+        setDiscountLogs([]);
+      } finally {
+        setIsDiscountLogsLoading(false);
+      }
+    })();
   };
 
   const handleApplyDiscount = async () => {
@@ -318,6 +340,16 @@ export const Products = () => {
     const performedAt = new Date().toLocaleString();
     const performedBy =
       user?.name || user?.username || user?.email || user?.fullName || "";
+
+    if (!selectedProduct?.id) {
+      addToast({
+        title: "No se puede aplicar el descuento",
+        description: "No se encontró el producto.",
+        color: "danger",
+        icon: <DismissCircleFilled className="size-5" />,
+      });
+      return;
+    }
 
     if (!Number.isFinite(currentQty)) {
       addToast({
@@ -349,74 +381,26 @@ export const Products = () => {
       return;
     }
 
-    const stockCatalogueId = parseInt(selectedProduct?.stockCatalogueId);
-    const productStatusId = parseInt(selectedProduct?.productStatusId);
-    const unitOfMeasurementId = parseInt(selectedProduct?.unitOfMeasurementId);
-    const warehouseTypeId = parseInt(selectedProduct?.warehouseTypeId);
-    const numeroContenedores = parseInt(selectedProduct?.numeroContenedores);
-    const fechaIngreso = selectedProduct?.fechaIngreso ?? selectedProduct?.fecha;
-
-    const hasRequiredFields =
-      selectedProduct?.id != null &&
-      Number.isFinite(stockCatalogueId) &&
-      Number.isFinite(productStatusId) &&
-      Number.isFinite(unitOfMeasurementId) &&
-      Number.isFinite(warehouseTypeId) &&
-      Number.isFinite(numeroContenedores) &&
-      String(selectedProduct?.nombre || "").trim() &&
-      String(selectedProduct?.lote || "").trim() &&
-      String(selectedProduct?.loteProveedor || "").trim() &&
-      String(selectedProduct?.codigoProducto || "").trim() &&
-      String(selectedProduct?.numeroAnalisis || "").trim() &&
-      Boolean(fechaIngreso);
-
-    if (!hasRequiredFields) {
-      addToast({
-        title: "No se puede aplicar el descuento",
-        description:
-          "Este producto no tiene todos los datos requeridos para actualizarse desde esta acción. Use 'Actualizar producto'.",
-        color: "warning",
-        icon: <DismissCircleFilled className="size-5" />,
-      });
-      return;
-    }
-
     const nextQty = currentQty - discountQty;
 
     try {
       setIsDiscountLoading(true);
 
-      const productData = {
-        id: selectedProduct.id,
-        stockCatalogueId,
-        productStatusId,
-        unitOfMeasurementId,
-        warehouseTypeId,
-        nombre: selectedProduct.nombre?.trim(),
-        lote: selectedProduct.lote?.trim(),
-        loteProveedor: selectedProduct.loteProveedor?.trim(),
-        fabricante: selectedProduct.fabricante?.trim() || null,
-        distribuidor: selectedProduct.distribuidor?.trim() || null,
-        codigoProducto: selectedProduct.codigoProducto?.trim(),
-        numeroAnalisis: selectedProduct.numeroAnalisis?.trim(),
-        fechaIngreso,
-        fechaCaducidad:
-          selectedProduct.fechaCaducidad ?? selectedProduct.caducidad,
-        reanalisis: selectedProduct.reanalisis,
-        fechaMuestreo: selectedProduct.fechaMuestreo ?? selectedProduct.muestreo,
-        cantidadTotal: parseInt(nextQty),
-        numeroContenedores,
-      };
+      const response = await createProductDiscount(selectedProduct.id, {
+        amount: parseInt(discountQty),
+        description: discountDescription?.trim() || null,
+      });
 
-      const response = await updateProduct(productData);
       const success = response?.type === "SUCCESS";
+      const updatedCantidadTotal = response?.data?.cantidadTotal;
+      const savedDiscount = response?.data?.discount;
 
       addToast({
         title: success
           ? "Se aplicó el descuento"
           : "No se pudo aplicar el descuento",
         description: success
-          ? `Cantidad actualizada a ${nextQty}.${performedBy ? ` Realizado por: ${performedBy}.` : ""} Fecha: ${performedAt}.${discountDescription?.trim() ? ` Descripción: ${discountDescription.trim()}.` : ""}`
+          ? `Cantidad actualizada a ${updatedCantidadTotal ?? nextQty}.${performedBy ? ` Realizado por: ${performedBy}.` : ""} Fecha: ${performedAt}.${discountDescription?.trim() ? ` Descripción: ${discountDescription.trim()}.` : ""}`
           : "Ocurrió un error al procesar la solicitud.",
         color: success ? "primary" : "danger",
         icon: success ? (
@@ -427,6 +411,16 @@ export const Products = () => {
       });
 
       if (success) {
+        if (savedDiscount) {
+          setDiscountLogs((prev) => [savedDiscount, ...(prev || [])]);
+        }
+
+        if (updatedCantidadTotal != null) {
+          setSelectedProduct((prev) => ({
+            ...(prev || {}),
+            cantidadTotal: updatedCantidadTotal,
+          }));
+        }
         setIsDiscountModalOpen(false);
         triggerRefresh();
       }
@@ -978,7 +972,9 @@ export const Products = () => {
                                         className="rounded-md transition-all !duration-1000 ease-in-out w-40"
                                         key="handleDiscountProduct"
                                         startContent={
-                                          <EditFilled className="size-5" />
+                                          <span className="size-5 flex items-center justify-center font-bold">
+                                            %
+                                          </span>
                                         }
                                         onPress={() => handleOpenDiscountModal(item)}
                                       >
@@ -1342,6 +1338,52 @@ export const Products = () => {
                         "transition-colors !duration-1000 ease-in-out caret-primary bg-background-100 border-transparent text-current",
                     }}
                   />
+
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm font-medium">Histórico de descuentos</p>
+
+                    <div className="max-h-40 overflow-y-auto pr-1 space-y-2">
+                      {isDiscountLogsLoading ? (
+                        <p className="text-sm text-background-500">
+                          Cargando...
+                        </p>
+                      ) : discountLogs.length > 0 ? (
+                        discountLogs.map((log) => (
+                          <div
+                            key={log.id ?? `${log.createdAt}-${log.amount}`}
+                            className="bg-background-100 rounded-lg px-3 py-2"
+                          >
+                            <p className="text-sm font-medium">
+                              -{log.amount}
+                              {" "}
+                              <span className="text-background-500 font-normal">
+                                ({log.quantityBefore} → {log.quantityAfter})
+                              </span>
+                            </p>
+                            <p className="text-xs text-background-500 break-words">
+                              {log.createdAt
+                                ? formatDateLiteral(log.createdAt, true)
+                                : "-"}
+                              {log.createdByUserName
+                                ? ` • ${log.createdByUserName}`
+                                : log.createdByUserEmail
+                                ? ` • ${log.createdByUserEmail}`
+                                : ""}
+                            </p>
+                            {log.description && (
+                              <p className="text-xs text-background-500 break-words pt-1">
+                                {log.description}
+                              </p>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-background-500">
+                          Sin descuentos registrados.
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
                   <div className="flex flex-col gap-1">
                     <p className="text-sm text-background-500">

@@ -56,6 +56,31 @@ export const getQrCodeImage = async (hash) => {
     }
 }
 
+export const createProductDiscount = async (productId, discountData) => {
+    try {
+        const response = await api.post(`/products/${productId}/discounts`, discountData)
+
+        if (response.status >= 200 && response.status < 300) {
+            return response.data
+        }
+
+        throw new Error(`Código de estado inesperado: ${response.status}`)
+    } catch (error) {
+        console.error('[createProductDiscount] Error:', error)
+        throw error
+    }
+}
+
+export const getProductDiscounts = async (productId) => {
+    try {
+        const response = await api.get(`/products/${productId}/discounts`)
+        return response.data
+    } catch (error) {
+        console.error('[getProductDiscounts] Error:', error)
+        throw error
+    }
+}
+
 export const updateProduct = async (productData) => {
     try {
         const response = await api.put('/products', productData)
